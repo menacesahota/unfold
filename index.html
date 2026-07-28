@@ -253,9 +253,19 @@
                 <a href="mailto:hello@unfold.supply">hello@unfold.supply</a>
               </div>
             </div>
-            <form class="quote-form" id="quote-form" method="POST" enctype="multipart/form-data">
+            <form
+              class="quote-form"
+              id="quote-form"
+              method="POST"
+              enctype="multipart/form-data"
+              action="https://formsubmit.co/hello@unfold.supply"
+            >
               <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
               <input type="hidden" name="_captcha" value="false" />
+              <input type="hidden" name="_template" value="table" />
+              <input type="hidden" name="_next" value="https://unfold.supply/?quote=sent#quote" />
+              <input type="hidden" name="_subject" id="quote-subject" value="Box quote request" />
+              <input type="hidden" name="_replyto" id="quote-replyto" value="" />
               <div class="field-row">
                 <label class="field">
                   Name
@@ -283,7 +293,7 @@
                   multiple
                   accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.svg,.ai,.eps,.zip,.doc,.docx"
                 />
-                <span class="file-hint">Artwork, dielines or briefs — up to 10MB total</span>
+                <span class="file-hint">Artwork, dielines or briefs — up to 10MB total. With files, you’ll return here after send.</span>
                 <p class="file-list" id="quote-file-list" hidden></p>
               </label>
               <button type="submit" class="btn btn-full">Send</button>

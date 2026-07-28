@@ -443,69 +443,67 @@ inputs.logo?.addEventListener('change', (e) => {
 });
 
 form?.addEventListener('submit', async (e) => {
-  e.preventDefault();
   const submitBtn = form.querySelector('button[type="submit"]');
   const fileInput = document.getElementById('quote-files');
   const files = fileInput?.files ? [...fileInput.files] : [];
   const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
   const maxBytes = 10 * 1024 * 1024;
 
+  const name = String(form.elements.name?.value || '').trim();
+  const email = String(form.elements.email?.value || '').trim();
+  const quantityField = form.elements.quantity;
+  const messageField = form.elements.message;
+  if (quantityField && !String(quantityField.value || '').trim()) {
+    quantityField.value = '—';
+  }
+  if (messageField && !String(messageField.value || '').trim()) {
+    messageField.value = '—';
+  }
+
+  const subjectField = document.getElementById('quote-subject');
+  const replytoField = document.getElementById('quote-replyto');
+  if (subjectField) subjectField.value = `Box quote request — ${name}`;
+  if (replytoField) replytoField.value = email;
+
   if (totalBytes > maxBytes) {
+    e.preventDefault();
     formStatus.textContent = 'Attachments are too large — please keep under 10MB total.';
     return;
   }
 
-  const name = String(form.elements.name?.value || '').trim();
-  const email = String(form.elements.email?.value || '').trim();
-  const quantity = String(form.elements.quantity?.value || '').trim() || '—';
-  const message = String(form.elements.message?.value || '').trim() || '—';
+  // FormSubmit only attaches files on a real browser form POST (AJAX drops them)
+  if (files.length) {
+    if (submitBtn) submitBtn.disabled = true;
+    formStatus.textContent = 'Uploading attachment and sending…';
+    return;
+  }
 
+  e.preventDefault();
   if (submitBtn) submitBtn.disabled = true;
-  formStatus.textContent = files.length ? 'Sending with attachments…' : 'Sending…';
+  formStatus.textContent = 'Sending…';
 
   try {
-    let res;
-    let result = {};
+    if (fileInput) fileInput.disabled = true;
 
-    if (files.length) {
-      // Multipart only when files are present — empty file fields break FormSubmit
-      const payload = new FormData();
-      payload.set('name', name);
-      payload.set('email', email);
-      payload.set('quantity', quantity);
-      payload.set('message', message);
-      payload.set('_replyto', email);
-      payload.set('_subject', `Box quote request — ${name}`);
-      payload.set('_template', 'table');
-      payload.set('_captcha', 'false');
-      for (const file of files) payload.append('attachment', file, file.name);
+    const res = await fetch('https://formsubmit.co/ajax/hello@unfold.supply', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        quantity: String(quantityField?.value || '—'),
+        message: String(messageField?.value || '—'),
+        _replyto: email,
+        _subject: `Box quote request — ${name}`,
+        _template: 'table',
+        _captcha: 'false',
+      }),
+    });
 
-      res = await fetch('https://formsubmit.co/ajax/hello@unfold.supply', {
-        method: 'POST',
-        headers: { Accept: 'application/json' },
-        body: payload,
-      });
-    } else {
-      res = await fetch('https://formsubmit.co/ajax/hello@unfold.supply', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          quantity,
-          message,
-          _replyto: email,
-          _subject: `Box quote request — ${name}`,
-          _template: 'table',
-          _captcha: 'false',
-        }),
-      });
-    }
-
-    result = await res.json().catch(() => ({}));
+    const result = await res.json().catch(() => ({}));
     const resultMessage = String(result.message || '');
     const needsActivation = /activat/i.test(resultMessage);
     const failed =
@@ -535,6 +533,7 @@ form?.addEventListener('submit', async (e) => {
     formStatus.textContent = `Could not send automatically.${detail} Email hello@unfold.supply and we will help.`;
     console.error(err);
   } finally {
+    if (fileInput) fileInput.disabled = false;
     if (submitBtn) submitBtn.disabled = false;
   }
 });
@@ -557,6 +556,9 @@ document.getElementById('quote-files')?.addEventListener('change', (e) => {
 if (new URLSearchParams(window.location.search).get('quote') === 'sent') {
   formStatus.textContent =
     'Sent — we will reply to your email within one working day.';
+  const url = new URL(window.location.href);
+  url.searchParams.delete('quote');
+  window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
 }
 
 window.addEventListener('storage', (e) => {
