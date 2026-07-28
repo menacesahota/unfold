@@ -4,7 +4,7 @@ import {
   estimateQtyBreaks,
   hasPricingOverrides,
 } from './pricing-config.js';
-import { renderFefcoPreviewSvg, FEFCO_PREVIEW_CODES } from './fefco-preview.js';
+import { fefcoPreviewSrc, fefcoPreviewAlt, FEFCO_PREVIEW_CODES } from './fefco-preview.js';
 
 const form = document.getElementById('quote-form');
 const formStatus = document.getElementById('form-status');
@@ -66,14 +66,16 @@ function populateFefcoCards() {
   fefcoCards.innerHTML = styles
     .map((style) => {
       const active = style.code === state.fefco;
-      const thumb = renderFefcoPreviewSvg(style.code, pricing.boards.kraft.color);
+      const src = fefcoPreviewSrc(style.code);
       return `
         <button type="button"
           class="fefco-card${active ? ' active' : ''}"
           role="option"
           aria-selected="${active}"
           data-fefco="${style.code}">
-          <span class="fefco-card-art">${thumb}</span>
+          <span class="fefco-card-art">
+            <img src="${src}" alt="" width="320" height="320" loading="lazy" />
+          </span>
           <span class="fefco-card-code">${style.code}</span>
           <span class="fefco-card-title">${style.cardTitle || style.shortLabel}</span>
         </button>`;
@@ -169,7 +171,9 @@ function updatePreview() {
   const fefco = pricing.fefco[state.fefco];
 
   if (previewHero) {
-    previewHero.innerHTML = renderFefcoPreviewSvg(state.fefco, board.color);
+    const src = fefcoPreviewSrc(state.fefco);
+    const alt = fefcoPreviewAlt(state.fefco, fefco?.label);
+    previewHero.innerHTML = `<img src="${src}" alt="${alt}" width="640" height="640" class="preview-hero-img${state.board === 'white' ? ' board-white' : ''}" />`;
   }
 
   if (previewBrand) {

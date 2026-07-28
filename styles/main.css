@@ -451,14 +451,18 @@ input[type="file"] {
 .fefco-card-art {
   display: block;
   width: 100%;
-  aspect-ratio: 320 / 200;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 6px;
+  background: #fff;
   pointer-events: none;
 }
 
-.fefco-card-art svg {
+.fefco-card-art img {
   display: block;
   width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
 .fefco-card-code {
@@ -494,13 +498,18 @@ input[type="file"] {
 }
 
 .preview-hero {
-  width: min(100%, 380px);
+  width: min(100%, 420px);
 }
 
-.preview-hero svg {
+.preview-hero-img {
   display: block;
   width: 100%;
   height: auto;
+  border-radius: 8px;
+}
+
+.preview-hero-img.board-white {
+  filter: saturate(0.15) brightness(1.35);
 }
 
 .preview-brand-line {
