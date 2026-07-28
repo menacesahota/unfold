@@ -215,7 +215,13 @@ function updatePreview() {
     if (previewHint) previewHint.textContent = 'Drag to rotate';
     if (previewBrandPhoto) previewBrandPhoto.hidden = true;
 
-    const s = Math.min(280 / Math.max(l, w, h), 1.5);
+    const fitBudget =
+      window.matchMedia('(max-width: 560px)').matches
+        ? 150
+        : window.matchMedia('(max-width: 900px)').matches
+          ? 200
+          : 280;
+    const s = Math.min(fitBudget / Math.max(l, w, h), 1.5);
     previewPack.style.setProperty('--w', `${l * s}px`);
     previewPack.style.setProperty('--h', `${h * s}px`);
     previewPack.style.setProperty('--d', `${w * s}px`);
@@ -501,3 +507,11 @@ window.addEventListener('focus', () => {
 
 populateFefcoCards();
 updatePreview();
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (isLive3d()) updatePreview();
+  }, 120);
+});
