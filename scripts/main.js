@@ -3,31 +3,26 @@ import {
   estimateUnitPrice,
   hasPricingOverrides,
 } from './pricing-config.js';
+import { drawFefcoBlank, sizeCanvas } from './fefco-draw.js';
 
 const form = document.getElementById('quote-form');
 const formStatus = document.getElementById('form-status');
-
-const DEFAULT_VIEW = { x: -16, y: -30 };
 
 const state = {
   board: 'kraft',
   wall: 'single',
   fefco: '0201',
-  rotX: DEFAULT_VIEW.x,
-  rotY: DEFAULT_VIEW.y,
 };
 
 let pricing = loadPricing();
 
-const previewPack = document.getElementById('preview-pack');
-const previewArea = document.getElementById('design-preview');
-const previewBrand = document.getElementById('preview-brand');
-const previewLogo = document.getElementById('preview-logo');
 const previewSpec = document.getElementById('preview-spec');
 const estimatePrice = document.getElementById('estimate-price');
 const estimateNote = document.getElementById('estimate-note');
 const fefcoSelect = document.getElementById('fefco-style');
 const fefcoHint = document.getElementById('fefco-hint');
+const canvas = document.getElementById('fefco-canvas');
+const previewLogo = { src: '', hidden: true };
 
 const inputs = {
   l: document.getElementById('size-l'),
@@ -103,31 +98,30 @@ function updateEstimate() {
   }
 }
 
-function applyRotation() {
-  state.rotY = Math.min(Math.max(state.rotY, -85), 85);
-  state.rotX = Math.min(Math.max(state.rotX, -45), 45);
-  previewPack.style.transform = `rotateX(${state.rotX}deg) rotateY(${state.rotY}deg)`;
+function redrawFefco() {
+  if (!canvas) return;
+  const { ctx, width, height } = sizeCanvas(canvas);
+  const { l, w, h } = getDimensions();
+  const board = pricing.boards[state.board];
+
+  drawFefcoBlank(ctx, {
+    code: state.fefco,
+    length: l,
+    width: w,
+    height: h,
+    boardColor: board.color,
+    canvasW: width,
+    canvasH: height,
+  });
 }
 
 function updatePreview() {
   const { l, w, h } = getDimensions();
-  const brand = inputs.brand.value.trim();
   const board = pricing.boards[state.board];
   const wall = pricing.walls[state.wall];
   const fefco = pricing.fefco[state.fefco];
 
-  const s = Math.min(280 / Math.max(l, w, h), 1.5);
-  previewPack.style.setProperty('--w', `${l * s}px`);
-  previewPack.style.setProperty('--h', `${h * s}px`);
-  previewPack.style.setProperty('--d', `${w * s}px`);
-  previewPack.style.setProperty('--board', board.color);
-  previewPack.style.setProperty('--ink-print', inputs.ink.value);
-  previewPack.dataset.fefco = state.fefco;
-
-  previewBrand.textContent = brand;
-  previewBrand.hidden = !brand;
-
-  applyRotation();
+  redrawFefco();
   updateEstimate();
 
   previewSpec.textContent = `${fefco?.shortLabel || state.fefco} · ${l} × ${w} × ${h} mm · ${board.label} · ${wall.label}`;
@@ -142,40 +136,6 @@ function setSegment(group, value) {
   });
   updatePreview();
 }
-
-let dragging = false;
-let lastX = 0;
-let lastY = 0;
-
-previewArea?.addEventListener('pointerdown', (e) => {
-  dragging = true;
-  lastX = e.clientX;
-  lastY = e.clientY;
-  previewArea.classList.add('dragging');
-  previewArea.setPointerCapture(e.pointerId);
-});
-
-previewArea?.addEventListener('pointermove', (e) => {
-  if (!dragging) return;
-  state.rotY += (e.clientX - lastX) * 0.45;
-  state.rotX -= (e.clientY - lastY) * 0.45;
-  lastX = e.clientX;
-  lastY = e.clientY;
-  applyRotation();
-});
-
-['pointerup', 'pointercancel'].forEach((evt) => {
-  previewArea?.addEventListener(evt, () => {
-    dragging = false;
-    previewArea.classList.remove('dragging');
-  });
-});
-
-document.getElementById('reset-view')?.addEventListener('click', () => {
-  state.rotX = DEFAULT_VIEW.x;
-  state.rotY = DEFAULT_VIEW.y;
-  applyRotation();
-});
 
 function buildDesignSummary() {
   const { l, w, h } = getDimensions();
@@ -225,11 +185,6 @@ async function downloadPdf() {
   button.textContent = 'Generating…';
 
   try {
-    // Reset camera so the live preview matches the PDF style shot if user looks back
-    state.rotX = DEFAULT_VIEW.x;
-    state.rotY = DEFAULT_VIEW.y;
-    applyRotation();
-
     const { generateBoxMockupPdf } = await import('./pdf-mockup.js');
 
     const { l, w, h } = getDimensions();
@@ -290,15 +245,13 @@ inputs.logo?.addEventListener('change', (e) => {
   const file = e.target.files?.[0];
   if (!file) {
     previewLogo.hidden = true;
-    previewLogo.removeAttribute('src');
-    updatePreview();
+    previewLogo.src = '';
     return;
   }
   const reader = new FileReader();
   reader.onload = (ev) => {
     previewLogo.src = ev.target.result;
     previewLogo.hidden = false;
-    updatePreview();
   };
   reader.readAsDataURL(file);
 });
@@ -330,7 +283,11 @@ window.addEventListener('storage', (e) => {
 window.addEventListener('focus', () => {
   pricing = loadPricing();
   populateFefcoOptions();
-  updateEstimate();
+  updatePreview();
+});
+
+window.addEventListener('resize', () => {
+  redrawFefco();
 });
 
 populateFefcoOptions();
