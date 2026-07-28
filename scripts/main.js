@@ -436,21 +436,53 @@ inputs.logo?.addEventListener('change', (e) => {
   reader.readAsDataURL(file);
 });
 
-form?.addEventListener('submit', (e) => {
+form?.addEventListener('submit', async (e) => {
   e.preventDefault();
   const data = new FormData(form);
-  const subject = encodeURIComponent('Box quote request');
-  const body = encodeURIComponent(
-    [
-      `Name: ${data.get('name')}`,
-      `Email: ${data.get('email')}`,
-      `Quantity: ${data.get('quantity') || '—'}`,
-      '',
-      data.get('details') || '—',
-    ].join('\n')
-  );
-  window.location.href = `mailto:hello@unfold.supply?subject=${subject}&body=${body}`;
-  formStatus.textContent = 'Opening your email app…';
+  const submitBtn = form.querySelector('button[type="submit"]');
+
+  const name = String(data.get('name') || '').trim();
+  const email = String(data.get('email') || '').trim();
+  const quantity = String(data.get('quantity') || '').trim() || '—';
+  const details = String(data.get('details') || '').trim() || '—';
+
+  if (submitBtn) submitBtn.disabled = true;
+  formStatus.textContent = 'Sending…';
+
+  try {
+    const res = await fetch('https://formsubmit.co/ajax/hello@unfold.supply', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        quantity,
+        message: details,
+        _replyto: email,
+        _subject: `Box quote request — ${name}`,
+        _template: 'table',
+      }),
+    });
+
+    const result = await res.json().catch(() => ({}));
+
+    if (!res.ok || result.success === 'false' || result.success === false) {
+      throw new Error(result.message || 'Could not send quote request.');
+    }
+
+    form.reset();
+    formStatus.textContent =
+      'Sent — we will reply to your email within one working day.';
+  } catch (err) {
+    formStatus.textContent =
+      'Could not send automatically. Email hello@unfold.supply and we will help.';
+    console.error(err);
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
 });
 
 window.addEventListener('storage', (e) => {
