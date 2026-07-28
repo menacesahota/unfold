@@ -444,33 +444,34 @@ inputs.logo?.addEventListener('change', (e) => {
 
 form?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  const data = new FormData(form);
   const submitBtn = form.querySelector('button[type="submit"]');
+  const fileInput = document.getElementById('quote-files');
+  const files = fileInput?.files ? [...fileInput.files] : [];
+  const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
+  const maxBytes = 10 * 1024 * 1024;
 
-  const name = String(data.get('name') || '').trim();
-  const email = String(data.get('email') || '').trim();
-  const quantity = String(data.get('quantity') || '').trim() || '—';
-  const details = String(data.get('details') || '').trim() || '—';
+  if (totalBytes > maxBytes) {
+    formStatus.textContent = 'Attachments are too large — please keep under 10MB total.';
+    return;
+  }
+
+  const payload = new FormData(form);
+  const email = String(payload.get('email') || '').trim();
+  const name = String(payload.get('name') || '').trim();
+  if (!payload.get('quantity')) payload.set('quantity', '—');
+  if (!String(payload.get('message') || '').trim()) payload.set('message', '—');
+  payload.set('_replyto', email);
+  payload.set('_subject', `Box quote request — ${name}`);
+  payload.set('_template', 'table');
 
   if (submitBtn) submitBtn.disabled = true;
-  formStatus.textContent = 'Sending…';
+  formStatus.textContent = files.length ? 'Sending with attachments…' : 'Sending…';
 
   try {
     const res = await fetch('https://formsubmit.co/ajax/hello@unfold.supply', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        quantity,
-        message: details,
-        _replyto: email,
-        _subject: `Box quote request — ${name}`,
-        _template: 'table',
-      }),
+      headers: { Accept: 'application/json' },
+      body: payload,
     });
 
     const result = await res.json().catch(() => ({}));
@@ -480,6 +481,11 @@ form?.addEventListener('submit', async (e) => {
     }
 
     form.reset();
+    const fileList = document.getElementById('quote-file-list');
+    if (fileList) {
+      fileList.hidden = true;
+      fileList.textContent = '';
+    }
     formStatus.textContent =
       'Sent — we will reply to your email within one working day.';
   } catch (err) {
@@ -489,6 +495,21 @@ form?.addEventListener('submit', async (e) => {
   } finally {
     if (submitBtn) submitBtn.disabled = false;
   }
+});
+
+document.getElementById('quote-files')?.addEventListener('change', (e) => {
+  const list = document.getElementById('quote-file-list');
+  if (!list) return;
+  const files = [...(e.target.files || [])];
+  if (!files.length) {
+    list.hidden = true;
+    list.textContent = '';
+    return;
+  }
+  list.hidden = false;
+  list.textContent = files
+    .map((file) => `${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)`)
+    .join(' · ');
 });
 
 window.addEventListener('storage', (e) => {

@@ -924,6 +924,41 @@ input[type="file"] {
   color: var(--ink-muted);
 }
 
+.file-field input[type="file"] {
+  padding: 0.65rem 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px dashed var(--line-dark, var(--line));
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.file-field input[type="file"]::file-selector-button {
+  margin-right: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--stage);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.file-hint {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+.file-list {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+}
+
 .form-note {
   font-size: 0.875rem;
   text-align: center;
@@ -989,6 +1024,14 @@ input[type="file"] {
     max-width: 100%;
   }
 
+  .preview-hero {
+    width: min(58%, 220px);
+  }
+
+  .fefco-card-art {
+    aspect-ratio: 4 / 3;
+  }
+
   .fefco-cards {
     grid-template-columns: 1fr 1fr;
   }
@@ -1022,6 +1065,10 @@ input[type="file"] {
     min-height: 180px;
     max-height: 220px;
     padding: 0.75rem;
+  }
+
+  .preview-hero {
+    width: min(52%, 170px);
   }
 
   .steps,
