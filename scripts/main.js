@@ -455,29 +455,65 @@ form?.addEventListener('submit', async (e) => {
     return;
   }
 
-  const payload = new FormData(form);
-  const email = String(payload.get('email') || '').trim();
-  const name = String(payload.get('name') || '').trim();
-  if (!payload.get('quantity')) payload.set('quantity', '—');
-  if (!String(payload.get('message') || '').trim()) payload.set('message', '—');
-  payload.set('_replyto', email);
-  payload.set('_subject', `Box quote request — ${name}`);
-  payload.set('_template', 'table');
+  const name = String(form.elements.name?.value || '').trim();
+  const email = String(form.elements.email?.value || '').trim();
+  const quantity = String(form.elements.quantity?.value || '').trim() || '—';
+  const message = String(form.elements.message?.value || '').trim() || '—';
 
   if (submitBtn) submitBtn.disabled = true;
   formStatus.textContent = files.length ? 'Sending with attachments…' : 'Sending…';
 
   try {
-    const res = await fetch('https://formsubmit.co/ajax/hello@unfold.supply', {
-      method: 'POST',
-      headers: { Accept: 'application/json' },
-      body: payload,
-    });
+    let res;
+    let result = {};
 
-    const result = await res.json().catch(() => ({}));
+    if (files.length) {
+      // Multipart only when files are present — empty file fields break FormSubmit
+      const payload = new FormData();
+      payload.set('name', name);
+      payload.set('email', email);
+      payload.set('quantity', quantity);
+      payload.set('message', message);
+      payload.set('_replyto', email);
+      payload.set('_subject', `Box quote request — ${name}`);
+      payload.set('_template', 'table');
+      payload.set('_captcha', 'false');
+      for (const file of files) payload.append('attachment', file, file.name);
 
-    if (!res.ok || result.success === 'false' || result.success === false) {
-      throw new Error(result.message || 'Could not send quote request.');
+      res = await fetch('https://formsubmit.co/ajax/hello@unfold.supply', {
+        method: 'POST',
+        headers: { Accept: 'application/json' },
+        body: payload,
+      });
+    } else {
+      res = await fetch('https://formsubmit.co/ajax/hello@unfold.supply', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          quantity,
+          message,
+          _replyto: email,
+          _subject: `Box quote request — ${name}`,
+          _template: 'table',
+          _captcha: 'false',
+        }),
+      });
+    }
+
+    result = await res.json().catch(() => ({}));
+    const resultMessage = String(result.message || '');
+    const needsActivation = /activat/i.test(resultMessage);
+    const failed =
+      (!res.ok || result.success === 'false' || result.success === false) &&
+      !needsActivation;
+
+    if (failed) {
+      throw new Error(resultMessage || 'Could not send quote request.');
     }
 
     form.reset();
@@ -486,11 +522,17 @@ form?.addEventListener('submit', async (e) => {
       fileList.hidden = true;
       fileList.textContent = '';
     }
-    formStatus.textContent =
-      'Sent — we will reply to your email within one working day.';
+
+    if (needsActivation) {
+      formStatus.textContent =
+        'Almost there — check hello@unfold.supply for a FormSubmit activation email, click Activate once, then submit again.';
+    } else {
+      formStatus.textContent =
+        'Sent — we will reply to your email within one working day.';
+    }
   } catch (err) {
-    formStatus.textContent =
-      'Could not send automatically. Email hello@unfold.supply and we will help.';
+    const detail = err?.message ? ` ${err.message}` : '';
+    formStatus.textContent = `Could not send automatically.${detail} Email hello@unfold.supply and we will help.`;
     console.error(err);
   } finally {
     if (submitBtn) submitBtn.disabled = false;
@@ -511,6 +553,11 @@ document.getElementById('quote-files')?.addEventListener('change', (e) => {
     .map((file) => `${file.name} (${Math.max(1, Math.round(file.size / 1024))} KB)`)
     .join(' · ');
 });
+
+if (new URLSearchParams(window.location.search).get('quote') === 'sent') {
+  formStatus.textContent =
+    'Sent — we will reply to your email within one working day.';
+}
 
 window.addEventListener('storage', (e) => {
   if (e.key === 'unfold-pricing-config') {

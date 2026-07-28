@@ -959,6 +959,15 @@ input[type="file"] {
   color: var(--ink-muted);
 }
 
+.honey {
+  position: absolute;
+  left: -9999px;
+  height: 0;
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .form-note {
   font-size: 0.875rem;
   text-align: center;
