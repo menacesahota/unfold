@@ -1,33 +1,31 @@
 import {
   loadPricing,
   estimateUnitPrice,
+  estimateQtyBreaks,
   hasPricingOverrides,
 } from './pricing-config.js';
+import { renderFefcoPreviewSvg, FEFCO_PREVIEW_CODES } from './fefco-preview.js';
 
 const form = document.getElementById('quote-form');
 const formStatus = document.getElementById('form-status');
-
-const DEFAULT_VIEW = { x: -16, y: -30 };
 
 const state = {
   board: 'kraft',
   wall: 'single',
   fefco: '0201',
-  rotX: DEFAULT_VIEW.x,
-  rotY: DEFAULT_VIEW.y,
+  logoDataUrl: '',
 };
 
 let pricing = loadPricing();
 
-const previewPack = document.getElementById('preview-pack');
-const previewArea = document.getElementById('design-preview');
+const previewHero = document.getElementById('preview-hero');
 const previewBrand = document.getElementById('preview-brand');
-const previewLogo = document.getElementById('preview-logo');
 const previewSpec = document.getElementById('preview-spec');
 const estimatePrice = document.getElementById('estimate-price');
 const estimateNote = document.getElementById('estimate-note');
-const fefcoSelect = document.getElementById('fefco-style');
+const fefcoCards = document.getElementById('fefco-cards');
 const fefcoHint = document.getElementById('fefco-hint');
+const qtyBreaksTable = document.getElementById('qty-breaks');
 
 const inputs = {
   l: document.getElementById('size-l'),
@@ -51,18 +49,46 @@ function getQuantity() {
   return Math.max(1, Math.round(Number(inputs.qty.value) || pricing.moq));
 }
 
-function populateFefcoOptions() {
-  if (!fefcoSelect) return;
-  const current = state.fefco || pricing.defaultFefco;
-  fefcoSelect.innerHTML = '';
-  Object.entries(pricing.fefco).forEach(([code, style]) => {
-    const option = document.createElement('option');
-    option.value = code;
-    option.textContent = style.label;
-    fefcoSelect.appendChild(option);
+function featuredStyles() {
+  return FEFCO_PREVIEW_CODES.filter((code) => pricing.fefco[code]).map((code) => ({
+    code,
+    ...pricing.fefco[code],
+  }));
+}
+
+function populateFefcoCards() {
+  if (!fefcoCards) return;
+  const styles = featuredStyles();
+  if (!pricing.fefco[state.fefco]) {
+    state.fefco = pricing.defaultFefco;
+  }
+
+  fefcoCards.innerHTML = styles
+    .map((style) => {
+      const active = style.code === state.fefco;
+      const thumb = renderFefcoPreviewSvg(style.code, pricing.boards.kraft.color);
+      return `
+        <button type="button"
+          class="fefco-card${active ? ' active' : ''}"
+          role="option"
+          aria-selected="${active}"
+          data-fefco="${style.code}">
+          <span class="fefco-card-art">${thumb}</span>
+          <span class="fefco-card-code">${style.code}</span>
+          <span class="fefco-card-title">${style.cardTitle || style.shortLabel}</span>
+        </button>`;
+    })
+    .join('');
+
+  fefcoCards.querySelectorAll('.fefco-card').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.fefco = btn.dataset.fefco;
+      populateFefcoCards();
+      updateFefcoHint();
+      updatePreview();
+    });
   });
-  fefcoSelect.value = pricing.fefco[current] ? current : pricing.defaultFefco;
-  state.fefco = fefcoSelect.value;
+
   updateFefcoHint();
 }
 
@@ -73,23 +99,29 @@ function updateFefcoHint() {
 
 function estimate() {
   const { l, w, h } = getDimensions();
-  const qty = getQuantity();
   return estimateUnitPrice(pricing, {
     length: l,
     width: w,
     height: h,
-    quantity: qty,
+    quantity: getQuantity(),
     board: state.board,
     wall: state.wall,
     fefco: state.fefco,
   });
 }
 
+function formatPence(unit) {
+  if (unit < 1) return `${Math.round(unit * 100)}p`;
+  return `£${unit.toFixed(2)}`;
+}
+
 function updateEstimate() {
   pricing = loadPricing();
+  const qty = getQuantity();
   const { unit, total, belowMoq } = estimate();
+  const { l, w, h } = getDimensions();
 
-  estimatePrice.textContent = `£${unit.toFixed(2)} per box · ≈ £${Math.round(total).toLocaleString('en-GB')} total`;
+  estimatePrice.textContent = `${formatPence(unit)} per box · ≈ £${Math.round(total).toLocaleString('en-GB')} total`;
 
   if (belowMoq) {
     estimateNote.textContent = `Our minimum order is ${pricing.moq} boxes.`;
@@ -98,15 +130,35 @@ function updateEstimate() {
     estimateNote.textContent = 'Ballpark — using your local pricing overrides.';
     estimateNote.classList.remove('estimate-warn');
   } else {
-    estimateNote.textContent = 'Ballpark — confirmed in your quote.';
+    estimateNote.textContent = 'Ballpark — confirmed in your quote. Ex VAT.';
     estimateNote.classList.remove('estimate-warn');
   }
-}
 
-function applyRotation() {
-  state.rotY = Math.min(Math.max(state.rotY, -85), 85);
-  state.rotX = Math.min(Math.max(state.rotX, -45), 45);
-  previewPack.style.transform = `rotateX(${state.rotX}deg) rotateY(${state.rotY}deg)`;
+  if (qtyBreaksTable) {
+    const breaks = estimateQtyBreaks(pricing, {
+      length: l,
+      width: w,
+      height: h,
+      quantity: qty,
+      board: state.board,
+      wall: state.wall,
+      fefco: state.fefco,
+    });
+
+    const body = qtyBreaksTable.querySelector('tbody');
+    body.innerHTML = breaks
+      .map((row) => {
+        const nearest = breaks.reduce((best, b) =>
+          Math.abs(b.quantity - qty) < Math.abs(best.quantity - qty) ? b : best
+        );
+        const isActive = row.quantity === nearest.quantity;
+        return `<tr class="${isActive ? 'active' : ''}">
+          <td>${row.quantity.toLocaleString('en-GB')}+</td>
+          <td>${formatPence(row.unit)}</td>
+        </tr>`;
+      })
+      .join('');
+  }
 }
 
 function updatePreview() {
@@ -116,21 +168,18 @@ function updatePreview() {
   const wall = pricing.walls[state.wall];
   const fefco = pricing.fefco[state.fefco];
 
-  const s = Math.min(280 / Math.max(l, w, h), 1.5);
-  previewPack.style.setProperty('--w', `${l * s}px`);
-  previewPack.style.setProperty('--h', `${h * s}px`);
-  previewPack.style.setProperty('--d', `${w * s}px`);
-  previewPack.style.setProperty('--board', board.color);
-  previewPack.style.setProperty('--ink-print', inputs.ink.value);
-  previewPack.dataset.fefco = state.fefco;
+  if (previewHero) {
+    previewHero.innerHTML = renderFefcoPreviewSvg(state.fefco, board.color);
+  }
 
-  previewBrand.textContent = brand;
-  previewBrand.hidden = !brand;
+  if (previewBrand) {
+    previewBrand.textContent = brand;
+    previewBrand.hidden = !brand;
+    previewBrand.style.color = inputs.ink.value;
+  }
 
-  applyRotation();
   updateEstimate();
-
-  previewSpec.textContent = `${fefco?.shortLabel || state.fefco} · ${l} × ${w} × ${h} mm · ${board.label} · ${wall.label}`;
+  previewSpec.textContent = `${fefco?.label || state.fefco} · ${l} × ${w} × ${h} mm · ${board.label} · ${wall.label}`;
 }
 
 function setSegment(group, value) {
@@ -142,40 +191,6 @@ function setSegment(group, value) {
   });
   updatePreview();
 }
-
-let dragging = false;
-let lastX = 0;
-let lastY = 0;
-
-previewArea?.addEventListener('pointerdown', (e) => {
-  dragging = true;
-  lastX = e.clientX;
-  lastY = e.clientY;
-  previewArea.classList.add('dragging');
-  previewArea.setPointerCapture(e.pointerId);
-});
-
-previewArea?.addEventListener('pointermove', (e) => {
-  if (!dragging) return;
-  state.rotY += (e.clientX - lastX) * 0.45;
-  state.rotX -= (e.clientY - lastY) * 0.45;
-  lastX = e.clientX;
-  lastY = e.clientY;
-  applyRotation();
-});
-
-['pointerup', 'pointercancel'].forEach((evt) => {
-  previewArea?.addEventListener(evt, () => {
-    dragging = false;
-    previewArea.classList.remove('dragging');
-  });
-});
-
-document.getElementById('reset-view')?.addEventListener('click', () => {
-  state.rotX = DEFAULT_VIEW.x;
-  state.rotY = DEFAULT_VIEW.y;
-  applyRotation();
-});
 
 function buildDesignSummary() {
   const { l, w, h } = getDimensions();
@@ -191,11 +206,11 @@ function buildDesignSummary() {
     `Size: ${l} × ${w} × ${h} mm`,
     `Board: ${board.label}, ${wall.label.toLowerCase()}`,
     `Quantity: ${getQuantity()}`,
-    `Estimate: £${unit.toFixed(2)}/box, ~£${Math.round(total)} total (ballpark)`,
+    `Estimate: ${formatPence(unit)}/box, ~£${Math.round(total)} total (ballpark)`,
   ];
 
   if (brand) lines.push(`Print: "${brand}" in ${inputs.ink.value}`);
-  if (previewLogo.src && !previewLogo.hidden) {
+  if (state.logoDataUrl) {
     lines.push('Logo: uploaded in designer (please re-attach with your email)');
   }
 
@@ -225,20 +240,13 @@ async function downloadPdf() {
   button.textContent = 'Generating…';
 
   try {
-    // Reset camera so the live preview matches the PDF style shot if user looks back
-    state.rotX = DEFAULT_VIEW.x;
-    state.rotY = DEFAULT_VIEW.y;
-    applyRotation();
-
     const { generateBoxMockupPdf } = await import('./pdf-mockup.js');
-
     const { l, w, h } = getDimensions();
     const qty = getQuantity();
     const { unit, total } = estimate();
     const board = pricing.boards[state.board];
     const wall = pricing.walls[state.wall];
     const fefco = pricing.fefco[state.fefco];
-    const brand = inputs.brand.value.trim();
 
     await generateBoxMockupPdf({
       fefcoCode: state.fefco,
@@ -251,7 +259,7 @@ async function downloadPdf() {
       boardColor: board.color,
       wallLabel: wall.label,
       quantity: qty,
-      brand,
+      brand: inputs.brand.value.trim(),
       inkColor: inputs.ink.value,
       unitPrice: unit,
       totalPrice: total,
@@ -275,12 +283,6 @@ document.querySelectorAll('.segment-btn[data-wall]').forEach((btn) => {
   btn.addEventListener('click', () => setSegment('wall', btn.dataset.wall));
 });
 
-fefcoSelect?.addEventListener('change', () => {
-  state.fefco = fefcoSelect.value;
-  updateFefcoHint();
-  updatePreview();
-});
-
 Object.values(inputs).forEach((input) => {
   if (!input || input.type === 'file') return;
   input.addEventListener('input', updatePreview);
@@ -289,16 +291,12 @@ Object.values(inputs).forEach((input) => {
 inputs.logo?.addEventListener('change', (e) => {
   const file = e.target.files?.[0];
   if (!file) {
-    previewLogo.hidden = true;
-    previewLogo.removeAttribute('src');
-    updatePreview();
+    state.logoDataUrl = '';
     return;
   }
   const reader = new FileReader();
   reader.onload = (ev) => {
-    previewLogo.src = ev.target.result;
-    previewLogo.hidden = false;
-    updatePreview();
+    state.logoDataUrl = ev.target.result;
   };
   reader.readAsDataURL(file);
 });
@@ -306,7 +304,6 @@ inputs.logo?.addEventListener('change', (e) => {
 form?.addEventListener('submit', (e) => {
   e.preventDefault();
   const data = new FormData(form);
-
   const subject = encodeURIComponent('Box quote request');
   const body = encodeURIComponent(
     [
@@ -317,21 +314,23 @@ form?.addEventListener('submit', (e) => {
       data.get('details') || '—',
     ].join('\n')
   );
-
   window.location.href = `mailto:hello@unfold.supply?subject=${subject}&body=${body}`;
-
   formStatus.textContent = 'Opening your email app…';
 });
 
 window.addEventListener('storage', (e) => {
-  if (e.key === 'unfold-pricing-config') updatePreview();
+  if (e.key === 'unfold-pricing-config') {
+    pricing = loadPricing();
+    populateFefcoCards();
+    updatePreview();
+  }
 });
 
 window.addEventListener('focus', () => {
   pricing = loadPricing();
-  populateFefcoOptions();
-  updateEstimate();
+  populateFefcoCards();
+  updatePreview();
 });
 
-populateFefcoOptions();
+populateFefcoCards();
 updatePreview();

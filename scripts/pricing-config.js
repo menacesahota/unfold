@@ -50,47 +50,46 @@ export const DEFAULT_PRICING = {
     double: { label: 'Double wall', priceFactor: 1.4 },
   },
 
-  // Common FEFCO styles — priceFactor is relative to 0201
+  // Core live-quote styles (same set as Kite / industry calculators)
   fefco: {
     '0201': {
       label: '0201 — Regular slotted (RSC)',
-      shortLabel: '0201 RSC',
+      shortLabel: '0201',
+      cardTitle: 'Regular slotted',
       description: 'Standard shipping carton. Outer flaps meet in the middle.',
       priceFactor: 1,
-    },
-    '0200': {
-      label: '0200 — Half slotted (HSC)',
-      shortLabel: '0200 HSC',
-      description: 'Open-top carton with bottom flaps only. Often used with a lid.',
-      priceFactor: 0.95,
+      featured: true,
     },
     '0203': {
       label: '0203 — Full overlap (FOL)',
-      shortLabel: '0203 FOL',
+      shortLabel: '0203',
+      cardTitle: 'Full overlap',
       description: 'Outer flaps fully overlap for extra top and bottom strength.',
       priceFactor: 1.15,
+      featured: true,
     },
-    '0215': {
-      label: '0215 — Crash-lock base',
-      shortLabel: '0215 crash-lock',
-      description: 'Self-locking base. Fast to assemble, no tape needed underneath.',
-      priceFactor: 1.25,
+    '0426': {
+      label: '0426 — Self-locking mailer',
+      shortLabel: '0426',
+      cardTitle: 'Self-lock mailer',
+      description: 'Die-cut mailer with self-locking walls. No tape needed.',
+      priceFactor: 1.4,
+      featured: true,
     },
     '0427': {
       label: '0427 — Tray with hinged lid',
-      shortLabel: '0427 hinged lid',
-      description: 'Die-cut tray with hinged lid. Tabs lock into front-wall slots — no tape.',
+      shortLabel: '0427',
+      cardTitle: 'Hinged-lid tray',
+      description: 'Die-cut tray with hinged lid. Tabs lock into front-wall slots.',
       priceFactor: 1.45,
-    },
-    '0409': {
-      label: '0409 — Five-panel wrap',
-      shortLabel: '0409 five-panel',
-      description: 'Five-panel wrap for long or narrow products. Sealed with tape.',
-      priceFactor: 1.2,
+      featured: true,
     },
   },
 
   defaultFefco: '0201',
+
+  // Quantity breaks shown in the designer (like Kite)
+  qtyBreaks: [100, 250, 500, 1000, 2500, 5000],
 };
 
 export const PRICING_STORAGE_KEY = 'unfold-pricing-config';
@@ -129,6 +128,7 @@ function mergePricing(base, override) {
     ...base,
     ...override,
     referenceBox: { ...base.referenceBox, ...(override.referenceBox || {}) },
+    qtyBreaks: override.qtyBreaks || base.qtyBreaks,
     boards: {
       kraft: { ...base.boards.kraft, ...(override.boards?.kraft || {}) },
       white: { ...base.boards.white, ...(override.boards?.white || {}) },
@@ -189,6 +189,20 @@ export function estimateUnitPrice(
     fefcoCode,
     belowMoq: quantity < config.moq,
   };
+}
+
+/** Price table for qty breaks (same board/style/size). */
+export function estimateQtyBreaks(config, opts) {
+  const breaks = config.qtyBreaks || [100, 250, 500, 1000, 2500, 5000];
+  return breaks.map((quantity) => {
+    const result = estimateUnitPrice(config, { ...opts, quantity });
+    return {
+      quantity,
+      unit: result.unit,
+      total: result.total,
+      active: quantity === opts.quantity,
+    };
+  });
 }
 
 function clamp(value, min, max) {

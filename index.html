@@ -63,12 +63,12 @@
             <div class="designer-panel">
               <div class="control">
                 <span class="control-label">FEFCO style</span>
-                <select id="fefco-style" aria-label="FEFCO box style"></select>
+                <div class="fefco-cards" id="fefco-cards" role="listbox" aria-label="FEFCO box style"></div>
                 <p class="control-hint" id="fefco-hint"></p>
               </div>
 
               <div class="control">
-                <span class="control-label">Size — mm</span>
+                <span class="control-label">Size — mm (internal)</span>
                 <div class="size-inputs">
                   <label>
                     L
@@ -127,6 +127,15 @@
               <div class="estimate">
                 <p class="estimate-price" id="estimate-price"></p>
                 <p class="estimate-note" id="estimate-note">Ballpark — confirmed in your quote.</p>
+                <table class="qty-breaks" id="qty-breaks" aria-label="Price by quantity">
+                  <thead>
+                    <tr>
+                      <th>Qty</th>
+                      <th>Per box</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
               </div>
 
               <div class="designer-actions">
@@ -137,41 +146,13 @@
 
             <div class="designer-preview-wrap">
               <div class="designer-preview" id="design-preview">
-                <div class="preview-stage">
-                  <div class="preview-pack" id="preview-pack" data-fefco="0201">
-                    <div class="pack-face face-front">
-                      <img class="pack-logo" id="preview-logo" alt="" hidden />
-                      <span class="pack-brand" id="preview-brand"></span>
-                    </div>
-                    <div class="pack-face face-back"></div>
-                    <div class="pack-face face-right"></div>
-                    <div class="pack-face face-left"></div>
-                    <div class="pack-face face-top">
-                      <span class="flap flap-a"></span>
-                      <span class="flap flap-b"></span>
-                    </div>
-                    <div class="pack-face face-bottom">
-                      <span class="crash-lock"></span>
-                    </div>
-                    <div class="pack-lid">
-                      <div class="pack-face lid-face">
-                        <span class="lid-tuck"></span>
-                      </div>
-                    </div>
-                    <div class="folder-wrap" aria-hidden="true">
-                      <span class="folder-panel"></span>
-                      <span class="folder-panel"></span>
-                      <span class="folder-panel"></span>
-                    </div>
-                  </div>
-                  <div class="preview-shadow"></div>
-                </div>
+                <div class="preview-hero" id="preview-hero"></div>
+                <p class="preview-brand-line" id="preview-brand" hidden></p>
               </div>
               <div class="preview-meta">
                 <p class="preview-spec" id="preview-spec"></p>
-                <button type="button" class="preview-reset" id="reset-view">Reset view</button>
               </div>
-              <p class="preview-hint">Drag to rotate</p>
+              <p class="preview-hint">Style illustration · not to scale</p>
             </div>
           </div>
         </div>

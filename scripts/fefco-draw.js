@@ -101,8 +101,20 @@ export function drawFefcoBlank(ctx, {
   const areaW = canvasW - pad * 2;
   const areaH = canvasH - pad * 2;
 
-  if (code === '0427') {
-    draw0427(ctx, { L, W, H, fill, stroke, scoreCol, ink, pad, areaW, areaH });
+  if (code === '0427' || code === '0426') {
+    draw0427(ctx, {
+      L,
+      W,
+      H,
+      fill,
+      stroke,
+      scoreCol,
+      ink,
+      pad,
+      areaW,
+      areaH,
+      selfLock: code === '0426',
+    });
     return;
   }
   if (code === '0409') {
@@ -323,7 +335,9 @@ function drawCrashLockBottom(ctx, { xs, by, botH, gap, fill, stroke }) {
  *   tuck tabs → lid (L×W) → back (L×H) → bottom (L×W) → front (L×H)
  * Side walls (H×W) sit left/right of the bottom panel.
  */
-function draw0427(ctx, { L, W, H, fill, stroke, scoreCol, ink, pad, areaW, areaH }) {
+function draw0427(ctx, {
+  L, W, H, fill, stroke, scoreCol, ink, pad, areaW, areaH, selfLock = false,
+}) {
   const tuck = Math.max(H * 0.28, W * 0.12, 18);
   const tabW = Math.min(L * 0.18, L / 2 - 8);
   const tabH = Math.max(tuck * 0.55, 10);
@@ -437,7 +451,13 @@ function draw0427(ctx, { L, W, H, fill, stroke, scoreCol, ink, pad, areaW, areaH
   label(ctx, 'SIDE', xSideL + s(H) / 2, yBase + s(W) / 2, ink);
   label(ctx, 'SIDE', xSideR + s(H) / 2, yBase + s(W) / 2, ink);
 
-  caption(ctx, 'FEFCO 0427  ·  tray with hinged lid  ·  tab & slot lock  ·  not to scale', pad);
+  caption(
+    ctx,
+    selfLock
+      ? 'FEFCO 0426  ·  self-locking mailer  ·  not to scale'
+      : 'FEFCO 0427  ·  tray with hinged lid  ·  tab & slot lock  ·  not to scale',
+    pad
+  );
 }
 
 /**

@@ -23,11 +23,9 @@ const fields = {
   singleFactor: form.elements.singleFactor,
   doubleFactor: form.elements.doubleFactor,
   fefco0201: form.elements.fefco0201,
-  fefco0200: form.elements.fefco0200,
   fefco0203: form.elements.fefco0203,
-  fefco0215: form.elements.fefco0215,
+  fefco0426: form.elements.fefco0426,
   fefco0427: form.elements.fefco0427,
-  fefco0409: form.elements.fefco0409,
   sizeExponent: form.elements.sizeExponent,
   quantityExponent: form.elements.quantityExponent,
   sizeFactorMin: form.elements.sizeFactorMin,
@@ -92,28 +90,21 @@ function readFormConfig() {
         ...DEFAULT_PRICING.fefco['0201'],
         priceFactor: num(fields.fefco0201, DEFAULT_PRICING.fefco['0201'].priceFactor),
       },
-      '0200': {
-        ...DEFAULT_PRICING.fefco['0200'],
-        priceFactor: num(fields.fefco0200, DEFAULT_PRICING.fefco['0200'].priceFactor),
-      },
       '0203': {
         ...DEFAULT_PRICING.fefco['0203'],
         priceFactor: num(fields.fefco0203, DEFAULT_PRICING.fefco['0203'].priceFactor),
       },
-      '0215': {
-        ...DEFAULT_PRICING.fefco['0215'],
-        priceFactor: num(fields.fefco0215, DEFAULT_PRICING.fefco['0215'].priceFactor),
+      '0426': {
+        ...DEFAULT_PRICING.fefco['0426'],
+        priceFactor: num(fields.fefco0426, DEFAULT_PRICING.fefco['0426'].priceFactor),
       },
       '0427': {
         ...DEFAULT_PRICING.fefco['0427'],
         priceFactor: num(fields.fefco0427, DEFAULT_PRICING.fefco['0427'].priceFactor),
       },
-      '0409': {
-        ...DEFAULT_PRICING.fefco['0409'],
-        priceFactor: num(fields.fefco0409, DEFAULT_PRICING.fefco['0409'].priceFactor),
-      },
     },
     defaultFefco: DEFAULT_PRICING.defaultFefco,
+    qtyBreaks: DEFAULT_PRICING.qtyBreaks,
   };
 }
 
@@ -129,11 +120,9 @@ function fillForm(config) {
   fields.singleFactor.value = config.walls.single.priceFactor;
   fields.doubleFactor.value = config.walls.double.priceFactor;
   fields.fefco0201.value = config.fefco['0201'].priceFactor;
-  fields.fefco0200.value = config.fefco['0200'].priceFactor;
   fields.fefco0203.value = config.fefco['0203'].priceFactor;
-  fields.fefco0215.value = config.fefco['0215'].priceFactor;
+  fields.fefco0426.value = config.fefco['0426'].priceFactor;
   fields.fefco0427.value = config.fefco['0427'].priceFactor;
-  fields.fefco0409.value = config.fefco['0409'].priceFactor;
   fields.sizeExponent.value = config.sizeExponent;
   fields.quantityExponent.value = config.quantityExponent;
   fields.sizeFactorMin.value = config.sizeFactorMin;

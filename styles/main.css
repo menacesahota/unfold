@@ -376,10 +376,102 @@ input[type="file"] {
   color: #b45309;
 }
 
+.qty-breaks {
+  width: 100%;
+  margin-top: 1rem;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.qty-breaks th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-faint);
+  padding: 0 0 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.qty-breaks th:last-child,
+.qty-breaks td:last-child {
+  text-align: right;
+}
+
+.qty-breaks td {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-muted);
+}
+
+.qty-breaks tr.active td {
+  color: var(--ink);
+  font-weight: 600;
+}
+
 .designer-actions {
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
+}
+
+/* FEFCO style cards */
+.fefco-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.625rem;
+}
+
+.fefco-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding: 0.5rem 0.5rem 0.625rem;
+  text-align: left;
+  font-family: var(--font);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.fefco-card:hover {
+  border-color: var(--ink-faint);
+}
+
+.fefco-card.active {
+  border-color: var(--ink);
+  background: var(--stage);
+}
+
+.fefco-card-art {
+  display: block;
+  width: 100%;
+  aspect-ratio: 320 / 200;
+  pointer-events: none;
+}
+
+.fefco-card-art svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fefco-card-code {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+
+.fefco-card-title {
+  font-size: 0.6875rem;
+  color: var(--ink-muted);
+  line-height: 1.3;
 }
 
 /* Preview */
@@ -390,287 +482,31 @@ input[type="file"] {
 
 .designer-preview {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 460px;
-  background: var(--stage);
-  border-radius: 16px;
-  perspective: 1100px;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-}
-
-.designer-preview.dragging {
-  cursor: grabbing;
-}
-
-.preview-stage {
-  position: relative;
-  transform-style: preserve-3d;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.preview-pack {
-  position: relative;
-  width: var(--w, 220px);
-  height: var(--h, 120px);
-  transform-style: preserve-3d;
-}
-
-.pack-face {
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.625rem;
-  background: var(--board, var(--kraft));
-  color: var(--ink-print, #1a1a1a);
-  overflow: hidden;
-  padding: 0.75rem;
+  gap: 0.75rem;
+  min-height: 420px;
+  padding: 1.5rem;
+  background: var(--stage);
+  border-radius: 16px;
+  border: 1px solid var(--line);
 }
 
-.face-front {
-  width: var(--w);
-  height: var(--h);
-  transform: translateZ(calc(var(--d) / 2));
+.preview-hero {
+  width: min(100%, 380px);
 }
 
-.face-back {
-  width: var(--w);
-  height: var(--h);
-  transform: rotateY(180deg) translateZ(calc(var(--d) / 2));
-  filter: brightness(0.85);
-}
-
-.face-right {
-  width: var(--d);
-  height: var(--h);
-  left: calc(50% - var(--d) / 2);
-  transform: rotateY(90deg) translateZ(calc(var(--w) / 2));
-  filter: brightness(0.9);
-}
-
-.face-left {
-  width: var(--d);
-  height: var(--h);
-  left: calc(50% - var(--d) / 2);
-  transform: rotateY(-90deg) translateZ(calc(var(--w) / 2));
-  filter: brightness(0.9);
-}
-
-.face-top {
-  width: var(--w);
-  height: var(--d);
-  top: calc(50% - var(--d) / 2);
-  transform: rotateX(90deg) translateZ(calc(var(--h) / 2));
-  filter: brightness(0.97);
-  padding: 0;
-}
-
-.face-bottom {
-  width: var(--w);
-  height: var(--d);
-  top: calc(50% - var(--d) / 2);
-  transform: rotateX(-90deg) translateZ(calc(var(--h) / 2));
-  filter: brightness(0.8);
-  padding: 0;
-}
-
-/* Shared flap / lid helpers — hidden unless a FEFCO style needs them */
-.flap,
-.crash-lock,
-.pack-lid,
-.folder-wrap {
-  display: none;
-}
-
-.flap {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 50%;
-  background: inherit;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
-}
-
-.flap-a { left: 0; }
-.flap-b { right: 0; }
-
-/* ---- FEFCO 0201 RSC — outer flaps meet in the middle ---- */
-.preview-pack[data-fefco="0201"] .flap {
+.preview-hero svg {
   display: block;
-}
-
-.preview-pack[data-fefco="0201"] .flap-a {
-  border-right: 1px solid rgba(0, 0, 0, 0.18);
-}
-
-/* ---- FEFCO 0200 HSC — open top ---- */
-.preview-pack[data-fefco="0200"] .face-top {
-  opacity: 0.18;
-  transform: rotateX(90deg) translateZ(calc(var(--h) / 2 + 4px));
-  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.2);
-}
-
-.preview-pack[data-fefco="0200"] .face-front::after,
-.preview-pack[data-fefco="0200"] .face-back::after,
-.preview-pack[data-fefco="0200"] .face-left::after,
-.preview-pack[data-fefco="0200"] .face-right::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: rgba(0, 0, 0, 0.18);
-}
-
-/* ---- FEFCO 0203 FOL — full overlap top ---- */
-.preview-pack[data-fefco="0203"] .face-top {
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.1),
-    0 3px 0 rgba(0, 0, 0, 0.12);
-}
-
-.preview-pack[data-fefco="0203"] .face-top::after {
-  content: "";
-  position: absolute;
-  inset: 12% 8%;
-  border: 1px dashed rgba(0, 0, 0, 0.18);
-  pointer-events: none;
-}
-
-/* ---- FEFCO 0215 crash-lock base ---- */
-.preview-pack[data-fefco="0215"] .crash-lock {
-  display: block;
-  position: absolute;
-  inset: 18% 22%;
-  border: 1.5px solid rgba(0, 0, 0, 0.28);
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-  background: rgba(0, 0, 0, 0.06);
-}
-
-.preview-pack[data-fefco="0215"] .flap {
-  display: block;
-}
-
-.preview-pack[data-fefco="0215"] .flap-a {
-  border-right: 1px solid rgba(0, 0, 0, 0.18);
-}
-
-/* ---- FEFCO 0427 mailer — hinged lid + tuck ---- */
-.preview-pack[data-fefco="0427"] .face-top {
-  display: none;
-}
-
-.preview-pack[data-fefco="0427"] .pack-lid {
-  display: block;
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: var(--w);
-  height: var(--d);
-  transform-style: preserve-3d;
-  transform: translateY(calc(var(--h) / -2)) rotateX(-108deg);
-  transform-origin: top center;
-}
-
-.preview-pack[data-fefco="0427"] .lid-face {
-  position: relative;
   width: 100%;
-  height: 100%;
-  background: var(--board, var(--kraft));
-  filter: brightness(0.95);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  height: auto;
 }
 
-.preview-pack[data-fefco="0427"] .lid-tuck {
-  display: block;
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: -14px;
-  height: 14px;
-  background: color-mix(in srgb, var(--board, var(--kraft)) 85%, black);
-  border-radius: 0 0 3px 3px;
-}
-
-.preview-pack[data-fefco="0427"] .face-front::before {
-  content: "";
-  position: absolute;
-  top: 10%;
-  left: 8%;
-  right: 8%;
-  height: 1px;
-  background: rgba(0, 0, 0, 0.12);
-}
-
-/* ---- FEFCO 0409 five-panel folder — flatter wrap ---- */
-.preview-pack[data-fefco="0409"] {
-  --folder-scale: 1.15;
-}
-
-.preview-pack[data-fefco="0409"] .face-top,
-.preview-pack[data-fefco="0409"] .face-bottom {
-  display: none;
-}
-
-.preview-pack[data-fefco="0409"] .face-front,
-.preview-pack[data-fefco="0409"] .face-back {
-  height: calc(var(--h) * 0.55);
-  top: calc(var(--h) * 0.225);
-}
-
-.preview-pack[data-fefco="0409"] .face-left,
-.preview-pack[data-fefco="0409"] .face-right {
-  height: calc(var(--h) * 0.55);
-  top: calc(var(--h) * 0.225);
-}
-
-.preview-pack[data-fefco="0409"] .folder-wrap {
-  display: flex;
-  position: absolute;
-  left: calc(var(--w) * -0.08);
-  top: calc(50% - 4px);
-  width: calc(var(--w) * 1.16);
-  height: 8px;
-  gap: 2px;
-  transform: translateZ(calc(var(--d) / 2 + 1px));
-}
-
-.preview-pack[data-fefco="0409"] .folder-panel {
-  flex: 1;
-  background: color-mix(in srgb, var(--board, var(--kraft)) 80%, black);
-  border-radius: 1px;
-}
-
-.preview-shadow {
-  position: absolute;
-  left: 50%;
-  bottom: calc(-1 * var(--h, 120px) / 2 - 32px);
-  width: calc(var(--w, 220px) * 1.35);
-  height: 26px;
-  transform: translateX(-50%);
-  background: radial-gradient(ellipse closest-side, rgba(0, 0, 0, 0.18), transparent);
-  pointer-events: none;
-}
-
-.pack-logo {
-  max-width: 55%;
-  max-height: 44px;
-  object-fit: contain;
-}
-
-.pack-brand {
+.preview-brand-line {
   font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   text-align: center;
 }
@@ -686,22 +522,6 @@ input[type="file"] {
   font-size: 0.875rem;
   color: var(--ink-muted);
   font-variant-numeric: tabular-nums;
-}
-
-.preview-reset {
-  padding: 0;
-  font-family: var(--font);
-  font-size: 0.8125rem;
-  color: var(--ink-faint);
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--line);
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.preview-reset:hover {
-  color: var(--ink);
 }
 
 .preview-hint {
@@ -846,7 +666,11 @@ input[type="file"] {
   }
 
   .designer-preview {
-    min-height: 340px;
+    min-height: 300px;
+  }
+
+  .fefco-cards {
+    grid-template-columns: 1fr 1fr;
   }
 
   .steps {
