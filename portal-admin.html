@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portal admin — unfold</title>
+    <meta name="description" content="Create and update customer orders for the unfold portal." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@8..144,400;8..144,500;8..144,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/portal.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="logo">unfold</a>
+        <nav class="nav" aria-label="Portal admin">
+          <a href="/portal.html">Orders</a>
+          <a href="/portal-admin.html">Admin</a>
+          <button type="button" class="linkish" id="nav-signout">Sign out</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="portal-main">
+      <div class="container" id="admin-gate">
+        <p class="muted">Checking access…</p>
+      </div>
+
+      <div class="container" id="admin-view" hidden>
+        <div class="panel-head">
+          <div>
+            <p class="portal-kicker">Admin</p>
+            <h1 class="portal-title">Keep customers updated</h1>
+            <p class="portal-lead">
+              Create orders with stored box specs and prices, then push journey
+              updates — sample approved, production, dispatch, delivery.
+            </p>
+          </div>
+        </div>
+
+        <div class="admin-grid">
+          <section class="card">
+            <h2>Update order status</h2>
+            <form id="update-form">
+              <label class="field">
+                Order
+                <select name="order_id" id="update-order" required></select>
+              </label>
+              <label class="field">
+                New status
+                <select name="status" id="update-status" required></select>
+              </label>
+              <label class="field">
+                Customer-facing title
+                <input type="text" name="title" placeholder="Sample approved" />
+              </label>
+              <label class="field">
+                Detail
+                <textarea name="detail" placeholder="What changed, and what happens next"></textarea>
+              </label>
+              <div class="field-row">
+                <label class="field">
+                  Lead time (working days)
+                  <input type="number" name="lead_time_days" min="0" />
+                </label>
+                <label class="field">
+                  Est. dispatch
+                  <input type="date" name="estimated_dispatch_date" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  Est. delivery
+                  <input type="date" name="estimated_delivery_date" />
+                </label>
+                <label class="field">
+                  Carrier
+                  <input type="text" name="carrier" placeholder="DPD / pallet network" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  Tracking number
+                  <input type="text" name="tracking_number" />
+                </label>
+                <label class="field">
+                  Tracking URL
+                  <input type="url" name="tracking_url" placeholder="https://" />
+                </label>
+              </div>
+              <label class="field">
+                Dispatch method
+                <input type="text" name="dispatch_method" placeholder="Pallet / parcels" />
+              </label>
+              <label class="field">
+                Dispatch address
+                <textarea name="dispatch_address"></textarea>
+              </label>
+              <label class="field">
+                Dispatch notes
+                <textarea name="dispatch_notes" placeholder="Time window, forklift, booking ref…"></textarea>
+              </label>
+              <button type="submit" class="btn btn-full">Publish update</button>
+              <p class="form-status" id="update-status-msg" role="status"></p>
+            </form>
+          </section>
+
+          <section class="card">
+            <h2>Create order</h2>
+            <form id="create-form">
+              <label class="field">
+                Customer
+                <select name="customer_id" id="create-customer" required></select>
+              </label>
+              <label class="field">
+                Title
+                <input type="text" name="title" required placeholder="Spring mailers" />
+              </label>
+              <label class="field">
+                Opening status
+                <select name="status" id="create-status"></select>
+              </label>
+              <label class="field">
+                Lead time (working days)
+                <input type="number" name="lead_time_days" min="0" value="12" />
+              </label>
+              <p class="muted" style="margin: 0 0 0.75rem">Box line 1</p>
+              <div class="field-row">
+                <label class="field">
+                  Name
+                  <input type="text" name="item_name" value="Custom box" />
+                </label>
+                <label class="field">
+                  FEFCO
+                  <input type="text" name="fefco" value="0201" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  L mm
+                  <input type="number" name="length_mm" value="300" />
+                </label>
+                <label class="field">
+                  W mm
+                  <input type="number" name="width_mm" value="220" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  H mm
+                  <input type="number" name="height_mm" value="150" />
+                </label>
+                <label class="field">
+                  Qty
+                  <input type="number" name="quantity" value="500" />
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  Board
+                  <select name="board">
+                    <option value="kraft">Kraft</option>
+                    <option value="white">White</option>
+                  </select>
+                </label>
+                <label class="field">
+                  Wall
+                  <select name="wall">
+                    <option value="single">Single</option>
+                    <option value="double">Double</option>
+                  </select>
+                </label>
+              </div>
+              <div class="field-row">
+                <label class="field">
+                  Unit price (£)
+                  <input type="number" name="unit_price" step="0.01" value="1.05" />
+                </label>
+                <label class="field">
+                  Brand text
+                  <input type="text" name="brand_text" />
+                </label>
+              </div>
+              <label class="field">
+                Print notes
+                <input type="text" name="print_notes" placeholder="1-colour logo, front" />
+              </label>
+              <label class="field">
+                Dispatch address
+                <textarea name="dispatch_address"></textarea>
+              </label>
+              <button type="submit" class="btn btn-full">Create order</button>
+              <p class="form-status" id="create-status-msg" role="status"></p>
+            </form>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/scripts/portal/portal-admin.js"></script>
+  </body>
+</html>

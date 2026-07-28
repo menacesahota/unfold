@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Order detail — unfold</title>
+    <meta name="description" content="Order journey, lead times, dispatch and pricing." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@8..144,400;8..144,500;8..144,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/portal.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="logo">unfold</a>
+        <nav class="nav" aria-label="Portal">
+          <a href="/portal.html">Orders</a>
+          <a href="/portal-admin.html" id="nav-admin" hidden>Admin</a>
+          <button type="button" class="linkish" id="nav-signout">Sign out</button>
+        </nav>
+      </div>
+    </header>
+
+    <main class="portal-main">
+      <div class="container" id="order-root">
+        <p class="muted">Loading order…</p>
+      </div>
+    </main>
+
+    <script type="module" src="/scripts/portal/portal-order.js"></script>
+  </body>
+</html>
