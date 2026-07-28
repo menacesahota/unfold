@@ -9,18 +9,31 @@ import { fefcoPreviewSrc, fefcoPreviewAlt, FEFCO_PREVIEW_CODES } from './fefco-p
 const form = document.getElementById('quote-form');
 const formStatus = document.getElementById('form-status');
 
+const DEFAULT_VIEW = { x: -16, y: -30 };
+
 const state = {
   board: 'kraft',
   wall: 'single',
   fefco: '0201',
   logoDataUrl: '',
+  logoFileName: '',
+  rotX: DEFAULT_VIEW.x,
+  rotY: DEFAULT_VIEW.y,
 };
 
 let pricing = loadPricing();
 
+const previewArea = document.getElementById('design-preview');
 const previewHero = document.getElementById('preview-hero');
+const previewStage = document.getElementById('preview-stage');
+const previewPack = document.getElementById('preview-pack');
+const previewLogo = document.getElementById('preview-logo');
 const previewBrand = document.getElementById('preview-brand');
+const previewBrandPhoto = document.getElementById('preview-brand-photo');
 const previewSpec = document.getElementById('preview-spec');
+const previewHint = document.getElementById('preview-hint');
+const resetViewBtn = document.getElementById('reset-view');
+const logoStatus = document.getElementById('logo-status');
 const estimatePrice = document.getElementById('estimate-price');
 const estimateNote = document.getElementById('estimate-note');
 const fefcoCards = document.getElementById('fefco-cards');
@@ -47,6 +60,10 @@ function getDimensions() {
 
 function getQuantity() {
   return Math.max(1, Math.round(Number(inputs.qty.value) || pricing.moq));
+}
+
+function isLive3d() {
+  return state.fefco === '0201';
 }
 
 function featuredStyles() {
@@ -163,25 +180,84 @@ function updateEstimate() {
   }
 }
 
+function applyRotation() {
+  if (!previewPack || !isLive3d()) return;
+  state.rotY = Math.min(Math.max(state.rotY, -85), 85);
+  state.rotX = Math.min(Math.max(state.rotX, -45), 45);
+  previewPack.style.transform = `rotateX(${state.rotX}deg) rotateY(${state.rotY}deg)`;
+}
+
+function updateLogoStatus() {
+  if (!logoStatus) return;
+  if (state.logoDataUrl) {
+    logoStatus.hidden = false;
+    logoStatus.innerHTML = `Logo for quote: <strong>${state.logoFileName || 'uploaded file'}</strong>`;
+  } else {
+    logoStatus.hidden = true;
+    logoStatus.textContent = '';
+  }
+}
+
 function updatePreview() {
   const { l, w, h } = getDimensions();
   const brand = inputs.brand.value.trim();
   const board = pricing.boards[state.board];
   const wall = pricing.walls[state.wall];
   const fefco = pricing.fefco[state.fefco];
+  const live3d = isLive3d();
 
-  if (previewHero) {
-    const src = fefcoPreviewSrc(state.fefco);
-    const alt = fefcoPreviewAlt(state.fefco, fefco?.label);
-    previewHero.innerHTML = `<img src="${src}" alt="${alt}" width="640" height="640" class="preview-hero-img${state.board === 'white' ? ' board-white' : ''}" />`;
+  previewArea?.classList.toggle('is-3d', live3d);
+
+  if (live3d) {
+    if (previewHero) previewHero.hidden = true;
+    if (previewStage) previewStage.hidden = false;
+    if (resetViewBtn) resetViewBtn.hidden = false;
+    if (previewHint) previewHint.textContent = 'Drag to rotate';
+    if (previewBrandPhoto) previewBrandPhoto.hidden = true;
+
+    const s = Math.min(280 / Math.max(l, w, h), 1.5);
+    previewPack.style.setProperty('--w', `${l * s}px`);
+    previewPack.style.setProperty('--h', `${h * s}px`);
+    previewPack.style.setProperty('--d', `${w * s}px`);
+    previewPack.style.setProperty('--board', board.color);
+    previewPack.style.setProperty('--ink-print', inputs.ink.value);
+
+    if (previewBrand) {
+      previewBrand.textContent = brand;
+      previewBrand.hidden = !brand;
+    }
+
+    if (previewLogo) {
+      if (state.logoDataUrl) {
+        previewLogo.src = state.logoDataUrl;
+        previewLogo.hidden = false;
+      } else {
+        previewLogo.removeAttribute('src');
+        previewLogo.hidden = true;
+      }
+    }
+
+    applyRotation();
+  } else {
+    if (previewStage) previewStage.hidden = true;
+    if (resetViewBtn) resetViewBtn.hidden = true;
+    if (previewHint) previewHint.textContent = 'Style illustration · not to scale';
+
+    if (previewHero) {
+      previewHero.hidden = false;
+      const src = fefcoPreviewSrc(state.fefco);
+      const alt = fefcoPreviewAlt(state.fefco, fefco?.label);
+      previewHero.innerHTML = `<img src="${src}" alt="${alt}" width="640" height="640" class="preview-hero-img${state.board === 'white' ? ' board-white' : ''}" />`;
+    }
+
+    if (previewBrandPhoto) {
+      previewBrandPhoto.textContent = brand;
+      previewBrandPhoto.hidden = !brand;
+      previewBrandPhoto.style.color = inputs.ink.value;
+    }
   }
 
-  if (previewBrand) {
-    previewBrand.textContent = brand;
-    previewBrand.hidden = !brand;
-    previewBrand.style.color = inputs.ink.value;
-  }
-
+  updateLogoStatus();
   updateEstimate();
   previewSpec.textContent = `${fefco?.label || state.fefco} · ${l} × ${w} × ${h} mm · ${board.label} · ${wall.label}`;
 }
@@ -195,6 +271,41 @@ function setSegment(group, value) {
   });
   updatePreview();
 }
+
+let dragging = false;
+let lastX = 0;
+let lastY = 0;
+
+previewArea?.addEventListener('pointerdown', (e) => {
+  if (!isLive3d()) return;
+  dragging = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  previewArea.classList.add('dragging');
+  previewArea.setPointerCapture(e.pointerId);
+});
+
+previewArea?.addEventListener('pointermove', (e) => {
+  if (!dragging || !isLive3d()) return;
+  state.rotY += (e.clientX - lastX) * 0.45;
+  state.rotX -= (e.clientY - lastY) * 0.45;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  applyRotation();
+});
+
+['pointerup', 'pointercancel'].forEach((evt) => {
+  previewArea?.addEventListener(evt, () => {
+    dragging = false;
+    previewArea?.classList.remove('dragging');
+  });
+});
+
+resetViewBtn?.addEventListener('click', () => {
+  state.rotX = DEFAULT_VIEW.x;
+  state.rotY = DEFAULT_VIEW.y;
+  applyRotation();
+});
 
 function buildDesignSummary() {
   const { l, w, h } = getDimensions();
@@ -213,9 +324,13 @@ function buildDesignSummary() {
     `Estimate: ${formatPence(unit)}/box, ~£${Math.round(total)} total (ballpark)`,
   ];
 
-  if (brand) lines.push(`Print: "${brand}" in ${inputs.ink.value}`);
+  if (brand) lines.push(`Print / brand text: "${brand}" in ${inputs.ink.value}`);
   if (state.logoDataUrl) {
-    lines.push('Logo: uploaded in designer (please re-attach with your email)');
+    lines.push(
+      `Logo artwork: YES — file "${state.logoFileName || 'uploaded'}" supplied in designer / PDF mockup. Please quote printed logo.`
+    );
+  } else {
+    lines.push('Logo artwork: none');
   }
 
   return lines.join('\n');
@@ -267,6 +382,8 @@ async function downloadPdf() {
       inkColor: inputs.ink.value,
       unitPrice: unit,
       totalPrice: total,
+      logoDataUrl: state.logoDataUrl || '',
+      logoFileName: state.logoFileName || '',
     });
   } catch (err) {
     console.error(err);
@@ -296,11 +413,15 @@ inputs.logo?.addEventListener('change', (e) => {
   const file = e.target.files?.[0];
   if (!file) {
     state.logoDataUrl = '';
+    state.logoFileName = '';
+    updatePreview();
     return;
   }
   const reader = new FileReader();
   reader.onload = (ev) => {
     state.logoDataUrl = ev.target.result;
+    state.logoFileName = file.name;
+    updatePreview();
   };
   reader.readAsDataURL(file);
 });

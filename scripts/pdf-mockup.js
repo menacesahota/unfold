@@ -63,6 +63,8 @@ export async function generateBoxMockupPdf(data) {
     inkColor,
     unitPrice,
     totalPrice,
+    logoDataUrl,
+    logoFileName,
   } = data;
 
   const pdf = new jsPDF('p', 'mm', 'a4');
@@ -160,6 +162,12 @@ export async function generateBoxMockupPdf(data) {
     ['Quantity', `${quantity} units`],
     ['Print / brand', brand ? `"${brand}"` : 'None specified'],
     ['Ink colour', inkColor || '—'],
+    [
+      'Logo artwork',
+      logoDataUrl
+        ? `YES — quote print (${logoFileName || 'uploaded file'})`
+        : 'None supplied',
+    ],
     ['Est. unit price', `£${unitPrice.toFixed(2)}`],
   ];
 
@@ -222,8 +230,72 @@ export async function generateBoxMockupPdf(data) {
     pdf.text(`Ink  ${inkColor}`, margin + 70, y + 5);
   }
 
-  // Legend
   y += 16;
+
+  // Logo artwork for quotation
+  if (logoDataUrl) {
+    pdf.setTextColor(20);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    pdf.text('PRINT ARTWORK — LOGO', margin, y);
+    y += 4;
+
+    pdf.setFillColor(255, 248, 230);
+    pdf.setDrawColor(201, 168, 124);
+    pdf.setLineWidth(0.4);
+    const artH = 28;
+    pdf.roundedRect(margin, y, pageW - margin * 2, artH, 2, 2, 'FD');
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    pdf.setTextColor(20);
+    pdf.text('Logo supplied — include in quotation / print pricing', margin + 5, y + 7);
+
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(7);
+    pdf.setTextColor(90);
+    pdf.text(
+      `File: ${logoFileName || 'uploaded image'}  ·  Artwork preview below (not placed on box mockup)`,
+      margin + 5,
+      y + 12
+    );
+
+    try {
+      const format = logoDataUrl.includes('image/jpeg') || logoDataUrl.includes('image/jpg')
+        ? 'JPEG'
+        : 'PNG';
+      const thumbW = 22;
+      const thumbH = 16;
+      pdf.addImage(
+        logoDataUrl,
+        format,
+        pageW - margin - thumbW - 4,
+        y + 5,
+        thumbW,
+        thumbH,
+        undefined,
+        'FAST'
+      );
+    } catch {
+      pdf.setTextColor(140);
+      pdf.text('(logo preview unavailable)', pageW - margin - 40, y + 14, { align: 'right' });
+    }
+
+    y += artH + 8;
+  } else {
+    pdf.setTextColor(20);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    pdf.text('PRINT ARTWORK', margin, y);
+    y += 5;
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(7);
+    pdf.setTextColor(120);
+    pdf.text('No logo uploaded with this mockup.', margin, y);
+    y += 8;
+  }
+
+  // Legend
   pdf.setTextColor(20);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(8);

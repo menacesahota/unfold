@@ -146,13 +146,32 @@
 
             <div class="designer-preview-wrap">
               <div class="designer-preview" id="design-preview">
-                <div class="preview-hero" id="preview-hero"></div>
-                <p class="preview-brand-line" id="preview-brand" hidden></p>
+                <div class="preview-hero" id="preview-hero" hidden></div>
+                <div class="preview-stage" id="preview-stage">
+                  <div class="preview-pack" id="preview-pack" data-fefco="0201">
+                    <div class="pack-face face-front">
+                      <img class="pack-logo" id="preview-logo" alt="" hidden />
+                      <span class="pack-brand" id="preview-brand"></span>
+                    </div>
+                    <div class="pack-face face-back"></div>
+                    <div class="pack-face face-right"></div>
+                    <div class="pack-face face-left"></div>
+                    <div class="pack-face face-top">
+                      <span class="flap flap-a"></span>
+                      <span class="flap flap-b"></span>
+                    </div>
+                    <div class="pack-face face-bottom"></div>
+                  </div>
+                  <div class="preview-shadow"></div>
+                </div>
+                <p class="preview-brand-line" id="preview-brand-photo" hidden></p>
               </div>
               <div class="preview-meta">
                 <p class="preview-spec" id="preview-spec"></p>
+                <button type="button" class="preview-reset" id="reset-view" hidden>Reset view</button>
               </div>
-              <p class="preview-hint">Style illustration · not to scale</p>
+              <p class="preview-hint" id="preview-hint">Drag to rotate</p>
+              <p class="logo-status" id="logo-status" hidden></p>
             </div>
           </div>
         </div>
