@@ -1,5 +1,5 @@
 /**
- * Technical PDF mockup — embeds the same FEFCO blank diagram as the designer.
+ * Technical PDF mockup — assembled notes + accurate FEFCO blank (net).
  */
 
 import { drawFefcoBlank } from './fefco-draw.js';
@@ -22,18 +22,15 @@ function drawSpecRow(pdf, x, y, label, value, width) {
   pdf.text(String(value), x + width * 0.38, y);
 }
 
-function renderBlankImage(data) {
+function renderBlankPng(data) {
   const canvas = document.createElement('canvas');
-  const width = 1100;
-  const height = 720;
+  const width = 1200;
+  const height = 780;
   canvas.width = width;
   canvas.height = height;
   const ctx = canvas.getContext('2d');
-
-  // Light stage background so board reads clearly on the PDF
   ctx.fillStyle = '#f7f6f3';
   ctx.fillRect(0, 0, width, height);
-
   drawFefcoBlank(ctx, {
     code: data.fefcoCode,
     length: data.length,
@@ -43,7 +40,6 @@ function renderBlankImage(data) {
     canvasW: width,
     canvasH: height,
   });
-
   return canvas.toDataURL('image/png');
 }
 
@@ -74,7 +70,7 @@ export async function generateBoxMockupPdf(data) {
   const pageH = pdf.internal.pageSize.getHeight();
   const margin = 14;
 
-  // --- Header ---
+  // Header
   pdf.setFillColor(17, 17, 16);
   pdf.rect(0, 0, pageW, 28, 'F');
   pdf.setFillColor(201, 168, 124);
@@ -98,7 +94,7 @@ export async function generateBoxMockupPdf(data) {
   pdf.setFontSize(7);
   pdf.text(new Date().toISOString().slice(0, 10), pageW - margin, 18, { align: 'right' });
 
-  // --- FEFCO banner ---
+  // FEFCO banner
   let y = 36;
   pdf.setFillColor(244, 243, 240);
   pdf.roundedRect(margin, y, pageW - margin * 2, 16, 2, 2, 'F');
@@ -112,9 +108,9 @@ export async function generateBoxMockupPdf(data) {
   const descLines = pdf.splitTextToSize(fefcoDescription || '', pageW - margin * 2 - 8);
   pdf.text(descLines[0] || '', margin + 4, y + 12);
 
-  // --- Blank diagram stage ---
+  // Blank / net stage
   y = 58;
-  const stageH = 98;
+  const stageH = 105;
   const stageW = pageW - margin * 2;
   pdf.setFillColor(247, 246, 243);
   pdf.roundedRect(margin, y, stageW, stageH, 3, 3, 'F');
@@ -122,16 +118,13 @@ export async function generateBoxMockupPdf(data) {
   pdf.setLineWidth(0.3);
   pdf.roundedRect(margin, y, stageW, stageH, 3, 3, 'S');
 
-  pdf.setTextColor(120);
+  pdf.setTextColor(110);
   pdf.setFontSize(6.5);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('FEFCO BLANK  ·  FLAT LAYOUT  ·  NOT TO SCALE', margin + 5, y + 7);
+  pdf.text('FEFCO BLANK (NET)  ·  FLAT LAYOUT  ·  NOT TO SCALE', margin + 5, y + 7);
 
-  const blankPng = renderBlankImage(data);
-  const imgPad = 4;
-  const imgW = stageW - imgPad * 2;
-  const imgH = stageH - 12;
-  pdf.addImage(blankPng, 'PNG', margin + imgPad, y + 9, imgW, imgH, undefined, 'FAST');
+  const blankPng = renderBlankPng(data);
+  pdf.addImage(blankPng, 'PNG', margin + 3, y + 9, stageW - 6, stageH - 12, undefined, 'FAST');
 
   // Corner brackets
   pdf.setDrawColor(201, 168, 124);
@@ -146,7 +139,7 @@ export async function generateBoxMockupPdf(data) {
   pdf.line(pageW - margin - 3, y + stageH - 3, pageW - margin - 3 - b, y + stageH - 3);
   pdf.line(pageW - margin - 3, y + stageH - 3, pageW - margin - 3, y + stageH - 3 - b);
 
-  // --- Spec grid ---
+  // Specs
   y = y + stageH + 10;
   pdf.setTextColor(20);
   pdf.setFont('helvetica', 'bold');
@@ -184,7 +177,7 @@ export async function generateBoxMockupPdf(data) {
 
   y += Math.ceil(specs.length / 2) * rowH + 8;
 
-  // --- Estimate strip ---
+  // Estimate
   pdf.setFillColor(17, 17, 16);
   pdf.roundedRect(margin, y, pageW - margin * 2, 18, 2, 2, 'F');
   pdf.setTextColor(160);
@@ -203,7 +196,7 @@ export async function generateBoxMockupPdf(data) {
 
   y += 26;
 
-  // --- Colour chips ---
+  // Materials
   pdf.setTextColor(20);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(8);
@@ -229,7 +222,19 @@ export async function generateBoxMockupPdf(data) {
     pdf.text(`Ink  ${inkColor}`, margin + 70, y + 5);
   }
 
-  // --- Footer ---
+  // Legend
+  y += 16;
+  pdf.setTextColor(20);
+  pdf.setFont('helvetica', 'bold');
+  pdf.setFontSize(8);
+  pdf.text('BLANK KEY', margin, y);
+  y += 5;
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(7);
+  pdf.setTextColor(90);
+  pdf.text('Solid lines = cuts   ·   Dashed lines = scores / creases   ·   Hatched strip = manufacturer’s joint', margin, y);
+
+  // Footer
   pdf.setDrawColor(220);
   pdf.setLineWidth(0.3);
   pdf.line(margin, pageH - 18, pageW - margin, pageH - 18);
