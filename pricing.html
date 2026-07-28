@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>unfold — pricing settings</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@8..144,400;8..144,500;8..144,600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/main.css" />
+    <link rel="stylesheet" href="/styles/pricing.css" />
+  </head>
+  <body class="pricing-page">
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="logo">unfold</a>
+        <nav class="nav" aria-label="Main">
+          <a href="/">← Back to site</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="container pricing-main">
+      <div class="pricing-intro">
+        <p class="eyebrow">Internal</p>
+        <h1>Quote pricing</h1>
+        <p>
+          Change the numbers that drive the on-site ballpark estimate.
+          Saving stores them in this browser. To update the live site for
+          everyone, copy the values into
+          <code>scripts/pricing-config.js</code> and push to GitHub.
+        </p>
+        <p class="status-pill" id="override-status"></p>
+      </div>
+
+      <div class="pricing-layout">
+        <form class="pricing-form" id="pricing-form">
+          <section class="pricing-card">
+            <h2>Core rates</h2>
+            <div class="field-grid">
+              <label>
+                Base price per box (£)
+                <input type="number" name="basePricePerBox" step="0.01" min="0.01" />
+              </label>
+              <label>
+                Minimum order (MOQ)
+                <input type="number" name="moq" step="1" min="1" />
+              </label>
+              <label>
+                Reference quantity
+                <input type="number" name="referenceQuantity" step="1" min="1" />
+                <span class="field-hint">Order size treated as “standard” for discounts</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="pricing-card">
+            <h2>Reference box size (mm)</h2>
+            <div class="field-grid three">
+              <label>
+                Length
+                <input type="number" name="refLength" step="1" min="1" />
+              </label>
+              <label>
+                Width
+                <input type="number" name="refWidth" step="1" min="1" />
+              </label>
+              <label>
+                Height
+                <input type="number" name="refHeight" step="1" min="1" />
+              </label>
+            </div>
+          </section>
+
+          <section class="pricing-card">
+            <h2>Board &amp; wall multipliers</h2>
+            <div class="field-grid">
+              <label>
+                Kraft multiplier
+                <input type="number" name="kraftFactor" step="0.01" min="0.1" />
+              </label>
+              <label>
+                White multiplier
+                <input type="number" name="whiteFactor" step="0.01" min="0.1" />
+              </label>
+              <label>
+                Single wall multiplier
+                <input type="number" name="singleFactor" step="0.01" min="0.1" />
+              </label>
+              <label>
+                Double wall multiplier
+                <input type="number" name="doubleFactor" step="0.01" min="0.1" />
+              </label>
+            </div>
+          </section>
+
+          <section class="pricing-card">
+            <h2>FEFCO style multipliers</h2>
+            <p class="card-note">Relative to 0201 (RSC). Die-cut and crash-lock styles usually cost more.</p>
+            <div class="field-grid">
+              <label>
+                0201 RSC
+                <input type="number" name="fefco0201" step="0.01" min="0.1" />
+              </label>
+              <label>
+                0200 HSC
+                <input type="number" name="fefco0200" step="0.01" min="0.1" />
+              </label>
+              <label>
+                0203 FOL
+                <input type="number" name="fefco0203" step="0.01" min="0.1" />
+              </label>
+              <label>
+                0215 crash-lock
+                <input type="number" name="fefco0215" step="0.01" min="0.1" />
+              </label>
+              <label>
+                0427 mailer
+                <input type="number" name="fefco0427" step="0.01" min="0.1" />
+              </label>
+              <label>
+                0409 five-panel
+                <input type="number" name="fefco0409" step="0.01" min="0.1" />
+              </label>
+            </div>
+          </section>
+
+          <section class="pricing-card">
+            <h2>Formula sensitivity</h2>
+            <div class="field-grid">
+              <label>
+                Size exponent
+                <input type="number" name="sizeExponent" step="0.05" min="0.1" max="2" />
+                <span class="field-hint">Higher = bigger boxes cost more</span>
+              </label>
+              <label>
+                Quantity exponent
+                <input type="number" name="quantityExponent" step="0.05" min="0.1" max="2" />
+                <span class="field-hint">Higher = steeper bulk discount</span>
+              </label>
+              <label>
+                Size factor min
+                <input type="number" name="sizeFactorMin" step="0.05" min="0.1" />
+              </label>
+              <label>
+                Size factor max
+                <input type="number" name="sizeFactorMax" step="0.05" min="0.1" />
+              </label>
+              <label>
+                Quantity factor min
+                <input type="number" name="quantityFactorMin" step="0.05" min="0.1" />
+              </label>
+              <label>
+                Quantity factor max
+                <input type="number" name="quantityFactorMax" step="0.05" min="0.1" />
+              </label>
+            </div>
+          </section>
+
+          <div class="pricing-actions">
+            <button type="submit" class="btn">Save to this browser</button>
+            <button type="button" class="btn btn-outline" id="reset-defaults">Reset to defaults</button>
+            <button type="button" class="btn btn-outline" id="copy-config">Copy config for production</button>
+          </div>
+          <p class="form-note" id="save-status" role="status"></p>
+        </form>
+
+        <aside class="pricing-preview">
+          <h2>Test estimate</h2>
+          <p class="preview-lead">See how a quote would look with these settings.</p>
+
+          <div class="field-grid three">
+            <label>
+              L
+              <input type="number" id="test-l" value="300" min="1" />
+            </label>
+            <label>
+              W
+              <input type="number" id="test-w" value="220" min="1" />
+            </label>
+            <label>
+              H
+              <input type="number" id="test-h" value="150" min="1" />
+            </label>
+          </div>
+
+          <div class="field-grid">
+            <label>
+              Quantity
+              <input type="number" id="test-qty" value="250" min="1" />
+            </label>
+            <label>
+              Board
+              <select id="test-board">
+                <option value="kraft">Kraft</option>
+                <option value="white">White</option>
+              </select>
+            </label>
+            <label>
+              Wall
+              <select id="test-wall">
+                <option value="single">Single</option>
+                <option value="double">Double</option>
+              </select>
+            </label>
+            <label>
+              FEFCO
+              <select id="test-fefco">
+                <option value="0201">0201 RSC</option>
+                <option value="0200">0200 HSC</option>
+                <option value="0203">0203 FOL</option>
+                <option value="0215">0215 crash-lock</option>
+                <option value="0427">0427 mailer</option>
+                <option value="0409">0409 folder</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="estimate-box">
+            <p class="estimate-main" id="test-result">—</p>
+            <ul class="estimate-breakdown" id="test-breakdown"></ul>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <script type="module" src="/scripts/pricing-admin.js"></script>
+  </body>
+</html>

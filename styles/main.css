@@ -235,6 +235,31 @@ section {
   color: var(--ink-faint);
 }
 
+.control-hint {
+  margin-top: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  line-height: 1.45;
+}
+
+select {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  font-family: var(--font);
+  font-size: 0.9375rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  transition: border-color 0.2s;
+}
+
+select:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
 .size-inputs {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

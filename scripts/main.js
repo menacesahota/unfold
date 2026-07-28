@@ -1,29 +1,23 @@
+import {
+  loadPricing,
+  estimateUnitPrice,
+  hasPricingOverrides,
+} from './pricing-config.js';
+
 const form = document.getElementById('quote-form');
 const formStatus = document.getElementById('form-status');
-
-const BOARDS = {
-  kraft: { label: 'Kraft', color: '#c9a87c', priceFactor: 1 },
-  white: { label: 'White', color: '#fafafa', priceFactor: 1.1 },
-};
-
-const WALLS = {
-  single: { label: 'Single wall', priceFactor: 1 },
-  double: { label: 'Double wall', priceFactor: 1.4 },
-};
-
-const MOQ = 100;
-const REF_QTY = 250;
-const REF_AREA = 2 * (300 * 220 + 300 * 150 + 220 * 150);
-const BASE_PRICE = 1.05;
 
 const DEFAULT_VIEW = { x: -16, y: -30 };
 
 const state = {
   board: 'kraft',
   wall: 'single',
+  fefco: '0201',
   rotX: DEFAULT_VIEW.x,
   rotY: DEFAULT_VIEW.y,
 };
+
+let pricing = loadPricing();
 
 const previewPack = document.getElementById('preview-pack');
 const previewArea = document.getElementById('design-preview');
@@ -32,6 +26,8 @@ const previewLogo = document.getElementById('preview-logo');
 const previewSpec = document.getElementById('preview-spec');
 const estimatePrice = document.getElementById('estimate-price');
 const estimateNote = document.getElementById('estimate-note');
+const fefcoSelect = document.getElementById('fefco-style');
+const fefcoHint = document.getElementById('fefco-hint');
 
 const inputs = {
   l: document.getElementById('size-l'),
@@ -45,45 +41,67 @@ const inputs = {
 
 function getDimensions() {
   return {
-    l: Number(inputs.l.value) || 300,
-    w: Number(inputs.w.value) || 220,
-    h: Number(inputs.h.value) || 150,
+    l: Number(inputs.l.value) || pricing.referenceBox.length,
+    w: Number(inputs.w.value) || pricing.referenceBox.width,
+    h: Number(inputs.h.value) || pricing.referenceBox.height,
   };
 }
 
 function getQuantity() {
-  return Math.max(1, Math.round(Number(inputs.qty.value) || MOQ));
+  return Math.max(1, Math.round(Number(inputs.qty.value) || pricing.moq));
 }
 
-/* ---- Estimate ---- */
+function populateFefcoOptions() {
+  if (!fefcoSelect) return;
+  const current = state.fefco || pricing.defaultFefco;
+  fefcoSelect.innerHTML = '';
+  Object.entries(pricing.fefco).forEach(([code, style]) => {
+    const option = document.createElement('option');
+    option.value = code;
+    option.textContent = style.label;
+    fefcoSelect.appendChild(option);
+  });
+  fefcoSelect.value = pricing.fefco[current] ? current : pricing.defaultFefco;
+  state.fefco = fefcoSelect.value;
+  updateFefcoHint();
+}
+
+function updateFefcoHint() {
+  if (!fefcoHint) return;
+  fefcoHint.textContent = pricing.fefco[state.fefco]?.description || '';
+}
 
 function estimate() {
   const { l, w, h } = getDimensions();
   const qty = getQuantity();
-  const area = 2 * (l * w + l * h + w * h);
-
-  const sizeFactor = Math.min(Math.max(Math.pow(area / REF_AREA, 0.7), 0.35), 4);
-  const qtyFactor = Math.min(Math.max(Math.pow(REF_QTY / qty, 0.3), 0.55), 1.9);
-  const unit = BASE_PRICE * sizeFactor * qtyFactor * BOARDS[state.board].priceFactor * WALLS[state.wall].priceFactor;
-
-  return { unit, total: unit * qty, qty, belowMoq: qty < MOQ };
+  return estimateUnitPrice(pricing, {
+    length: l,
+    width: w,
+    height: h,
+    quantity: qty,
+    board: state.board,
+    wall: state.wall,
+    fefco: state.fefco,
+  });
 }
 
 function updateEstimate() {
+  pricing = loadPricing();
   const { unit, total, belowMoq } = estimate();
 
   estimatePrice.textContent = `£${unit.toFixed(2)} per box · ≈ £${Math.round(total).toLocaleString('en-GB')} total`;
 
   if (belowMoq) {
-    estimateNote.textContent = `Our minimum order is ${MOQ} boxes.`;
+    estimateNote.textContent = `Our minimum order is ${pricing.moq} boxes.`;
     estimateNote.classList.add('estimate-warn');
+  } else if (hasPricingOverrides()) {
+    estimateNote.textContent = 'Ballpark — using your local pricing overrides.';
+    estimateNote.classList.remove('estimate-warn');
   } else {
     estimateNote.textContent = 'Ballpark — confirmed in your quote.';
     estimateNote.classList.remove('estimate-warn');
   }
 }
-
-/* ---- Preview ---- */
 
 function applyRotation() {
   state.rotY = Math.min(Math.max(state.rotY, -85), 85);
@@ -94,12 +112,15 @@ function applyRotation() {
 function updatePreview() {
   const { l, w, h } = getDimensions();
   const brand = inputs.brand.value.trim();
+  const board = pricing.boards[state.board];
+  const wall = pricing.walls[state.wall];
+  const fefco = pricing.fefco[state.fefco];
 
   const s = Math.min(280 / Math.max(l, w, h), 1.5);
   previewPack.style.setProperty('--w', `${l * s}px`);
   previewPack.style.setProperty('--h', `${h * s}px`);
   previewPack.style.setProperty('--d', `${w * s}px`);
-  previewPack.style.setProperty('--board', BOARDS[state.board].color);
+  previewPack.style.setProperty('--board', board.color);
   previewPack.style.setProperty('--ink-print', inputs.ink.value);
 
   previewBrand.textContent = brand;
@@ -108,7 +129,7 @@ function updatePreview() {
   applyRotation();
   updateEstimate();
 
-  previewSpec.textContent = `${l} × ${w} × ${h} mm · ${BOARDS[state.board].label} · ${WALLS[state.wall].label}`;
+  previewSpec.textContent = `${fefco?.shortLabel || state.fefco} · ${l} × ${w} × ${h} mm · ${board.label} · ${wall.label}`;
 }
 
 function setSegment(group, value) {
@@ -120,8 +141,6 @@ function setSegment(group, value) {
   });
   updatePreview();
 }
-
-/* ---- Drag to rotate ---- */
 
 let dragging = false;
 let lastX = 0;
@@ -157,17 +176,19 @@ document.getElementById('reset-view')?.addEventListener('click', () => {
   applyRotation();
 });
 
-/* ---- Quote handoff ---- */
-
 function buildDesignSummary() {
   const { l, w, h } = getDimensions();
   const { unit, total } = estimate();
   const brand = inputs.brand.value.trim();
+  const board = pricing.boards[state.board];
+  const wall = pricing.walls[state.wall];
+  const fefco = pricing.fefco[state.fefco];
 
   const lines = [
     '--- Box design ---',
+    `FEFCO: ${fefco?.label || state.fefco}`,
     `Size: ${l} × ${w} × ${h} mm`,
-    `Board: ${BOARDS[state.board].label}, ${WALLS[state.wall].label.toLowerCase()}`,
+    `Board: ${board.label}, ${wall.label.toLowerCase()}`,
     `Quantity: ${getQuantity()}`,
     `Estimate: £${unit.toFixed(2)}/box, ~£${Math.round(total)} total (ballpark)`,
   ];
@@ -195,8 +216,6 @@ document.getElementById('send-design')?.addEventListener('click', () => {
   document.getElementById('quote').scrollIntoView({ behavior: 'smooth' });
   quoteDetails.focus();
 });
-
-/* ---- PDF mockup ---- */
 
 async function downloadPdf() {
   const button = document.getElementById('download-pdf');
@@ -263,14 +282,18 @@ async function downloadPdf() {
 
 document.getElementById('download-pdf')?.addEventListener('click', downloadPdf);
 
-/* ---- Wiring ---- */
-
 document.querySelectorAll('.segment-btn[data-board]').forEach((btn) => {
   btn.addEventListener('click', () => setSegment('board', btn.dataset.board));
 });
 
 document.querySelectorAll('.segment-btn[data-wall]').forEach((btn) => {
   btn.addEventListener('click', () => setSegment('wall', btn.dataset.wall));
+});
+
+fefcoSelect?.addEventListener('change', () => {
+  state.fefco = fefcoSelect.value;
+  updateFefcoHint();
+  updatePreview();
 });
 
 Object.values(inputs).forEach((input) => {
@@ -315,4 +338,15 @@ form?.addEventListener('submit', (e) => {
   formStatus.textContent = 'Opening your email app…';
 });
 
+window.addEventListener('storage', (e) => {
+  if (e.key === 'unfold-pricing-config') updatePreview();
+});
+
+window.addEventListener('focus', () => {
+  pricing = loadPricing();
+  populateFefcoOptions();
+  updateEstimate();
+});
+
+populateFefcoOptions();
 updatePreview();
