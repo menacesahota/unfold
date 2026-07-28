@@ -1,46 +1,44 @@
 /**
- * Technical PDF mockup — assembled notes + accurate FEFCO blank (net).
+ * Clean black & white quotation PDF.
+ * Uses the same FEFCO style photos as the designer (not flat blanks).
  */
 
-import { drawFefcoBlank } from './fefco-draw.js';
-
-function hexToRgb(hex) {
-  const h = hex.replace('#', '');
-  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h;
-  const n = parseInt(full, 16);
-  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
-}
+import { fefcoPreviewSrc } from './fefco-preview.js';
 
 function drawSpecRow(pdf, x, y, label, value, width) {
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(8);
-  pdf.setTextColor(120);
+  pdf.setTextColor(100);
   pdf.text(label.toUpperCase(), x, y);
-  pdf.setTextColor(20);
+  pdf.setTextColor(0);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(9);
-  pdf.text(String(value), x + width * 0.38, y);
+  const maxW = width * 0.58;
+  const text = String(value);
+  const lines = pdf.splitTextToSize(text, maxW);
+  pdf.text(lines[0] || '', x + width * 0.4, y);
 }
 
-function renderBlankPng(data) {
-  const canvas = document.createElement('canvas');
-  const width = 1200;
-  const height = 780;
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#f7f6f3';
-  ctx.fillRect(0, 0, width, height);
-  drawFefcoBlank(ctx, {
-    code: data.fefcoCode,
-    length: data.length,
-    width: data.width,
-    height: data.height,
-    boardColor: data.boardColor || '#c9a87c',
-    canvasW: width,
-    canvasH: height,
+function formatMoney(amount) {
+  const n = Number(amount) || 0;
+  return `GBP ${n.toFixed(2)}`;
+}
+
+function formatTotal(amount) {
+  return `GBP ${Math.round(Number(amount) || 0).toLocaleString('en-GB')}`;
+}
+
+async function loadStyleImage(fefcoCode) {
+  const src = fefcoPreviewSrc(fefcoCode);
+  const res = await fetch(src);
+  if (!res.ok) throw new Error(`Could not load style image ${src}`);
+  const blob = await res.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
   });
-  return canvas.toDataURL('image/png');
 }
 
 /**
@@ -56,7 +54,6 @@ export async function generateBoxMockupPdf(data) {
     width,
     height,
     boardLabel,
-    boardColor,
     wallLabel,
     quantity,
     brand,
@@ -65,110 +62,101 @@ export async function generateBoxMockupPdf(data) {
     totalPrice,
     logoDataUrl,
     logoFileName,
+    qtyBreaks = [],
   } = data;
 
   const pdf = new jsPDF('p', 'mm', 'a4');
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
-  const margin = 14;
+  const margin = 16;
+  const contentW = pageW - margin * 2;
 
-  // Header
-  pdf.setFillColor(17, 17, 16);
-  pdf.rect(0, 0, pageW, 28, 'F');
-  pdf.setFillColor(201, 168, 124);
-  pdf.rect(0, 28, pageW, 0.8, 'F');
+  // --- Header (B&W) ---
+  pdf.setFillColor(0);
+  pdf.rect(0, 0, pageW, 26, 'F');
 
   pdf.setTextColor(255);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(16);
-  pdf.text('unfold', margin, 13);
+  pdf.text('unfold', margin, 12);
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(8);
-  pdf.setTextColor(180);
-  pdf.text('TECHNICAL BOX MOCKUP', margin, 19);
+  pdf.setTextColor(200);
+  pdf.text('BOX QUOTATION', margin, 19);
 
-  pdf.setTextColor(201, 168, 124);
+  pdf.setTextColor(255);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(9);
-  pdf.text(`FEFCO ${fefcoCode}`, pageW - margin, 12, { align: 'right' });
-  pdf.setTextColor(160);
+  pdf.text(`FEFCO ${fefcoCode}`, pageW - margin, 11, { align: 'right' });
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(7);
+  pdf.setTextColor(180);
   pdf.text(new Date().toISOString().slice(0, 10), pageW - margin, 18, { align: 'right' });
 
-  // FEFCO banner
-  let y = 36;
-  pdf.setFillColor(244, 243, 240);
-  pdf.roundedRect(margin, y, pageW - margin * 2, 16, 2, 2, 'F');
-  pdf.setTextColor(20);
+  // --- Style title ---
+  let y = 34;
+  pdf.setTextColor(0);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(11);
-  pdf.text(fefcoLabel, margin + 4, y + 7);
+  pdf.setFontSize(12);
+  pdf.text(fefcoLabel, margin, y);
+  y += 5;
   pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(7.5);
-  pdf.setTextColor(100);
-  const descLines = pdf.splitTextToSize(fefcoDescription || '', pageW - margin * 2 - 8);
-  pdf.text(descLines[0] || '', margin + 4, y + 12);
+  pdf.setFontSize(8);
+  pdf.setTextColor(90);
+  const desc = pdf.splitTextToSize(fefcoDescription || '', contentW);
+  pdf.text(desc[0] || '', margin, y);
 
-  // Blank / net stage
-  y = 58;
-  const stageH = 105;
-  const stageW = pageW - margin * 2;
-  pdf.setFillColor(247, 246, 243);
-  pdf.roundedRect(margin, y, stageW, stageH, 3, 3, 'F');
-  pdf.setDrawColor(220);
-  pdf.setLineWidth(0.3);
-  pdf.roundedRect(margin, y, stageW, stageH, 3, 3, 'S');
+  // --- Style photo (from quoting system) ---
+  y += 8;
+  const stageH = 78;
+  pdf.setDrawColor(0);
+  pdf.setLineWidth(0.4);
+  pdf.setFillColor(255);
+  pdf.rect(margin, y, contentW, stageH, 'FD');
 
   pdf.setTextColor(110);
   pdf.setFontSize(6.5);
   pdf.setFont('helvetica', 'normal');
-  pdf.text('FEFCO BLANK (NET)  ·  FLAT LAYOUT  ·  NOT TO SCALE', margin + 5, y + 7);
+  pdf.text('STYLE PREVIEW  -  NOT TO SCALE', margin + 4, y + 5);
 
-  const blankPng = renderBlankPng(data);
-  pdf.addImage(blankPng, 'PNG', margin + 3, y + 9, stageW - 6, stageH - 12, undefined, 'FAST');
+  try {
+    const stylePng = await loadStyleImage(fefcoCode);
+    const imgSize = 68;
+    const imgX = margin + (contentW - imgSize) / 2;
+    const imgY = y + 7;
+    pdf.addImage(stylePng, 'PNG', imgX, imgY, imgSize, imgSize, undefined, 'FAST');
+  } catch (err) {
+    console.error(err);
+    pdf.setTextColor(120);
+    pdf.setFontSize(9);
+    pdf.text('Style image unavailable', pageW / 2, y + stageH / 2, { align: 'center' });
+  }
 
-  // Corner brackets
-  pdf.setDrawColor(201, 168, 124);
-  pdf.setLineWidth(0.4);
-  const b = 4;
-  pdf.line(margin + 3, y + 3, margin + 3 + b, y + 3);
-  pdf.line(margin + 3, y + 3, margin + 3, y + 3 + b);
-  pdf.line(pageW - margin - 3, y + 3, pageW - margin - 3 - b, y + 3);
-  pdf.line(pageW - margin - 3, y + 3, pageW - margin - 3, y + 3 + b);
-  pdf.line(margin + 3, y + stageH - 3, margin + 3 + b, y + stageH - 3);
-  pdf.line(margin + 3, y + stageH - 3, margin + 3, y + stageH - 3 - b);
-  pdf.line(pageW - margin - 3, y + stageH - 3, pageW - margin - 3 - b, y + stageH - 3);
-  pdf.line(pageW - margin - 3, y + stageH - 3, pageW - margin - 3, y + stageH - 3 - b);
-
-  // Specs
+  // --- Specification ---
   y = y + stageH + 10;
-  pdf.setTextColor(20);
+  pdf.setTextColor(0);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(9);
   pdf.text('SPECIFICATION', margin, y);
-  pdf.setDrawColor(201, 168, 124);
+  pdf.setDrawColor(0);
   pdf.setLineWidth(0.5);
-  pdf.line(margin, y + 2, margin + 28, y + 2);
+  pdf.line(margin, y + 1.5, margin + 30, y + 1.5);
 
-  y += 10;
-  const colW = (pageW - margin * 2) / 2;
-  const rowH = 8;
+  y += 9;
+  const colW = contentW / 2;
+  const rowH = 7.5;
   const specs = [
     ['FEFCO style', fefcoLabel],
-    ['Internal size', `${length} × ${width} × ${height} mm`],
+    ['Internal size', `${length} x ${width} x ${height} mm`],
     ['Board', boardLabel],
     ['Wall', wallLabel],
     ['Quantity', `${quantity} units`],
     ['Print / brand', brand ? `"${brand}"` : 'None specified'],
-    ['Ink colour', inkColor || '—'],
+    ['Ink colour', inkColor || '-'],
     [
       'Logo artwork',
-      logoDataUrl
-        ? `YES — quote print (${logoFileName || 'uploaded file'})`
-        : 'None supplied',
+      logoDataUrl ? `Yes - quote print (${logoFileName || 'uploaded file'})` : 'None supplied',
     ],
-    ['Est. unit price', `£${unitPrice.toFixed(2)}`],
   ];
 
   specs.forEach((row, i) => {
@@ -177,148 +165,137 @@ export async function generateBoxMockupPdf(data) {
     const x = margin + col * colW;
     const ry = y + rowIndex * rowH;
     if (rowIndex % 2 === 0 && col === 0) {
-      pdf.setFillColor(248, 247, 244);
-      pdf.rect(margin, ry - 4, pageW - margin * 2, rowH, 'F');
+      pdf.setFillColor(245);
+      pdf.rect(margin, ry - 4, contentW, rowH, 'F');
     }
     drawSpecRow(pdf, x, ry, row[0], row[1], colW);
   });
 
-  y += Math.ceil(specs.length / 2) * rowH + 8;
+  y += Math.ceil(specs.length / 2) * rowH + 6;
 
-  // Estimate
-  pdf.setFillColor(17, 17, 16);
-  pdf.roundedRect(margin, y, pageW - margin * 2, 18, 2, 2, 'F');
-  pdf.setTextColor(160);
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(7);
-  pdf.text('BALLPARK ESTIMATE', margin + 5, y + 7);
-  pdf.setTextColor(201, 168, 124);
+  // --- Pricing ---
+  pdf.setTextColor(0);
   pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(14);
-  pdf.text(`£${unitPrice.toFixed(2)} / box`, margin + 5, y + 14);
+  pdf.setFontSize(9);
+  pdf.text('PRICING', margin, y);
+  pdf.setDrawColor(0);
+  pdf.setLineWidth(0.5);
+  pdf.line(margin, y + 1.5, margin + 18, y + 1.5);
+  y += 7;
+
+  // Primary estimate strip
+  pdf.setFillColor(0);
+  pdf.rect(margin, y, contentW, 16, 'F');
+  pdf.setTextColor(180);
+  pdf.setFont('helvetica', 'normal');
+  pdf.setFontSize(6.5);
+  pdf.text('BALLPARK ESTIMATE (EX VAT)', margin + 4, y + 5.5);
   pdf.setTextColor(255);
+  pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(12);
-  pdf.text(`≈ £${Math.round(totalPrice).toLocaleString('en-GB')} total`, pageW - margin - 5, y + 12, {
+  pdf.text(`${formatMoney(unitPrice)} / box`, margin + 4, y + 12.5);
+  pdf.setFontSize(11);
+  pdf.text(`Total ${formatTotal(totalPrice)}`, pageW - margin - 4, y + 12.5, {
     align: 'right',
   });
+  y += 20;
 
-  y += 26;
+  // Qty break table
+  if (qtyBreaks.length) {
+    pdf.setTextColor(0);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(8);
+    pdf.text('Price by quantity', margin, y);
+    y += 5;
 
-  // Materials
-  pdf.setTextColor(20);
-  pdf.setFont('helvetica', 'bold');
-  pdf.setFontSize(8);
-  pdf.text('MATERIALS', margin, y);
-  y += 4;
+    const breakCol = contentW / Math.min(qtyBreaks.length, 6);
+    pdf.setFillColor(245);
+    pdf.rect(margin, y - 3.5, contentW, 7, 'F');
+    pdf.setDrawColor(0);
+    pdf.setLineWidth(0.2);
+    pdf.rect(margin, y - 3.5, contentW, 14, 'S');
 
-  const boardRgb = hexToRgb(boardColor || '#c9a87c');
-  pdf.setFillColor(boardRgb.r, boardRgb.g, boardRgb.b);
-  pdf.roundedRect(margin, y, 12, 8, 1, 1, 'F');
-  pdf.setDrawColor(200);
-  pdf.roundedRect(margin, y, 12, 8, 1, 1, 'S');
-  pdf.setFont('helvetica', 'normal');
-  pdf.setFontSize(7.5);
-  pdf.setTextColor(80);
-  pdf.text(`Board  ${boardColor || ''}`, margin + 15, y + 5);
-
-  if (inkColor) {
-    const inkRgb = hexToRgb(inkColor);
-    pdf.setFillColor(inkRgb.r, inkRgb.g, inkRgb.b);
-    pdf.roundedRect(margin + 55, y, 12, 8, 1, 1, 'F');
-    pdf.setDrawColor(200);
-    pdf.roundedRect(margin + 55, y, 12, 8, 1, 1, 'S');
-    pdf.text(`Ink  ${inkColor}`, margin + 70, y + 5);
+    qtyBreaks.slice(0, 6).forEach((row, i) => {
+      const x = margin + i * breakCol + breakCol / 2;
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(6.5);
+      pdf.setTextColor(90);
+      pdf.text(`${row.quantity}+`, x, y, { align: 'center' });
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(8);
+      pdf.setTextColor(0);
+      pdf.text(formatMoney(row.unit), x, y + 6.5, { align: 'center' });
+    });
+    y += 16;
   }
 
-  y += 16;
-
-  // Logo artwork for quotation
+  // --- Logo ---
   if (logoDataUrl) {
-    pdf.setTextColor(20);
+    pdf.setTextColor(0);
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(9);
+    pdf.text('PRINT ARTWORK', margin, y);
+    pdf.setDrawColor(0);
+    pdf.line(margin, y + 1.5, margin + 32, y + 1.5);
+    y += 5;
+
+    pdf.setDrawColor(0);
+    pdf.setLineWidth(0.3);
+    const artH = 26;
+    pdf.rect(margin, y, contentW, artH, 'S');
+
     pdf.setFont('helvetica', 'bold');
     pdf.setFontSize(8);
-    pdf.text('PRINT ARTWORK — LOGO', margin, y);
-    y += 4;
-
-    pdf.setFillColor(255, 248, 230);
-    pdf.setDrawColor(201, 168, 124);
-    pdf.setLineWidth(0.4);
-    const artH = 28;
-    pdf.roundedRect(margin, y, pageW - margin * 2, artH, 2, 2, 'FD');
-
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(8);
-    pdf.setTextColor(20);
-    pdf.text('Logo supplied — include in quotation / print pricing', margin + 5, y + 7);
+    pdf.setTextColor(0);
+    pdf.text('Logo supplied - include in quotation / print pricing', margin + 4, y + 7);
 
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(7);
     pdf.setTextColor(90);
-    pdf.text(
-      `File: ${logoFileName || 'uploaded image'}  ·  Artwork preview below (not placed on box mockup)`,
-      margin + 5,
-      y + 12
-    );
+    pdf.text(`File: ${logoFileName || 'uploaded image'}`, margin + 4, y + 13);
 
     try {
-      const format = logoDataUrl.includes('image/jpeg') || logoDataUrl.includes('image/jpg')
-        ? 'JPEG'
-        : 'PNG';
-      const thumbW = 22;
-      const thumbH = 16;
+      const format =
+        logoDataUrl.includes('image/jpeg') || logoDataUrl.includes('image/jpg') ? 'JPEG' : 'PNG';
       pdf.addImage(
         logoDataUrl,
         format,
-        pageW - margin - thumbW - 4,
-        y + 5,
-        thumbW,
-        thumbH,
+        pageW - margin - 24,
+        y + 4,
+        20,
+        18,
         undefined,
         'FAST'
       );
     } catch {
-      pdf.setTextColor(140);
-      pdf.text('(logo preview unavailable)', pageW - margin - 40, y + 14, { align: 'right' });
+      /* ignore preview failure */
     }
-
-    y += artH + 8;
-  } else {
-    pdf.setTextColor(20);
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(8);
-    pdf.text('PRINT ARTWORK', margin, y);
-    y += 5;
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(7);
-    pdf.setTextColor(120);
-    pdf.text('No logo uploaded with this mockup.', margin, y);
-    y += 8;
+    y += artH + 6;
   }
 
-  // Legend
-  pdf.setTextColor(20);
+  // --- Notes ---
+  pdf.setTextColor(0);
   pdf.setFont('helvetica', 'bold');
   pdf.setFontSize(8);
-  pdf.text('BLANK KEY', margin, y);
-  y += 5;
+  pdf.text('NOTES', margin, y);
+  y += 4;
   pdf.setFont('helvetica', 'normal');
   pdf.setFontSize(7);
   pdf.setTextColor(90);
-  pdf.text('Solid lines = cuts   ·   Dashed lines = scores / creases   ·   Hatched strip = manufacturer’s joint', margin, y);
+  pdf.text(
+    'Prices are ballpark estimates ex VAT. Final board grade, print and pricing are confirmed before production.',
+    margin,
+    y
+  );
 
   // Footer
-  pdf.setDrawColor(220);
+  pdf.setDrawColor(0);
   pdf.setLineWidth(0.3);
-  pdf.line(margin, pageH - 18, pageW - margin, pageH - 18);
-  pdf.setTextColor(140);
+  pdf.line(margin, pageH - 16, pageW - margin, pageH - 16);
+  pdf.setTextColor(110);
   pdf.setFontSize(6.5);
-  pdf.text(
-    'Draft technical mockup for quotation only. Final dimensions, board grade, print and pricing are confirmed before production.',
-    margin,
-    pageH - 12
-  );
-  pdf.text('unfold.supply  ·  hello@unfold.supply', margin, pageH - 7);
-  pdf.text(`REF-${fefcoCode}-${length}x${width}x${height}`, pageW - margin, pageH - 7, {
+  pdf.text('unfold.supply  |  hello@unfold.supply', margin, pageH - 10);
+  pdf.text(`REF-${fefcoCode}-${length}x${width}x${height}`, pageW - margin, pageH - 10, {
     align: 'right',
   });
 

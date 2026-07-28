@@ -366,6 +366,15 @@ async function downloadPdf() {
     const board = pricing.boards[state.board];
     const wall = pricing.walls[state.wall];
     const fefco = pricing.fefco[state.fefco];
+    const breaks = estimateQtyBreaks(pricing, {
+      length: l,
+      width: w,
+      height: h,
+      quantity: qty,
+      board: state.board,
+      wall: state.wall,
+      fefco: state.fefco,
+    });
 
     await generateBoxMockupPdf({
       fefcoCode: state.fefco,
@@ -384,6 +393,7 @@ async function downloadPdf() {
       totalPrice: total,
       logoDataUrl: state.logoDataUrl || '',
       logoFileName: state.logoFileName || '',
+      qtyBreaks: breaks,
     });
   } catch (err) {
     console.error(err);
