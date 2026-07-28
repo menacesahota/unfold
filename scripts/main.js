@@ -122,6 +122,7 @@ function updatePreview() {
   previewPack.style.setProperty('--d', `${w * s}px`);
   previewPack.style.setProperty('--board', board.color);
   previewPack.style.setProperty('--ink-print', inputs.ink.value);
+  previewPack.dataset.fefco = state.fefco;
 
   previewBrand.textContent = brand;
   previewBrand.hidden = !brand;
@@ -224,55 +225,39 @@ async function downloadPdf() {
   button.textContent = 'Generating…';
 
   try {
-    const [{ jsPDF }, { default: html2canvas }] = await Promise.all([
-      import('jspdf'),
-      import('html2canvas'),
-    ]);
+    // Reset camera so the live preview matches the PDF style shot if user looks back
+    state.rotX = DEFAULT_VIEW.x;
+    state.rotY = DEFAULT_VIEW.y;
+    applyRotation();
 
-    const canvas = await html2canvas(previewArea, {
-      backgroundColor: '#f4f3f0',
-      scale: 2,
-      logging: false,
+    const { generateBoxMockupPdf } = await import('./pdf-mockup.js');
+
+    const { l, w, h } = getDimensions();
+    const qty = getQuantity();
+    const { unit, total } = estimate();
+    const board = pricing.boards[state.board];
+    const wall = pricing.walls[state.wall];
+    const fefco = pricing.fefco[state.fefco];
+    const brand = inputs.brand.value.trim();
+
+    await generateBoxMockupPdf({
+      fefcoCode: state.fefco,
+      fefcoLabel: fefco?.label || state.fefco,
+      fefcoDescription: fefco?.description || '',
+      length: l,
+      width: w,
+      height: h,
+      boardLabel: board.label,
+      boardColor: board.color,
+      wallLabel: wall.label,
+      quantity: qty,
+      brand,
+      inkColor: inputs.ink.value,
+      unitPrice: unit,
+      totalPrice: total,
     });
-
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pageW = pdf.internal.pageSize.getWidth();
-    const margin = 18;
-
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(16);
-    pdf.text('unfold — box mockup', margin, 22);
-
-    pdf.setFont('helvetica', 'normal');
-    pdf.setFontSize(9);
-    pdf.setTextColor(100);
-
-    let y = 32;
-    buildDesignSummary()
-      .split('\n')
-      .forEach((line) => {
-        pdf.text(line, margin, y);
-        y += 5;
-      });
-
-    const imgData = canvas.toDataURL('image/png');
-    const maxW = pageW - margin * 2;
-    const imgH = (canvas.height * maxW) / canvas.width;
-    const drawH = Math.min(imgH, 130);
-    const drawW = (canvas.width * drawH) / canvas.height;
-
-    pdf.addImage(imgData, 'PNG', margin, y + 6, drawW, drawH);
-
-    pdf.setFontSize(8);
-    pdf.setTextColor(140);
-    pdf.text(
-      `Draft mockup — final artwork and pricing confirmed before production. Generated ${new Date().toLocaleDateString('en-GB')}.`,
-      margin,
-      y + 6 + drawH + 10
-    );
-
-    pdf.save('unfold-box-mockup.pdf');
-  } catch {
+  } catch (err) {
+    console.error(err);
     alert('Could not generate PDF. Please try again.');
   } finally {
     button.disabled = false;
