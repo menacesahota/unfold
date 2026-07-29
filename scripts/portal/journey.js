@@ -3,33 +3,33 @@
 export const JOURNEY_STEPS = [
   {
     status: 'enquiry',
-    label: 'Enquiry received',
-    blurb: 'We have your request and are preparing a quote.',
-  },
-  {
-    status: 'quoted',
-    label: 'Quote sent',
-    blurb: 'Pricing is ready for your review.',
+    label: 'Brief received',
+    blurb: 'We have your project brief and are reviewing requirements.',
   },
   {
     status: 'sample_in_progress',
-    label: 'Sample in progress',
-    blurb: 'Your physical or digital sample is being prepared.',
+    label: 'Design in progress',
+    blurb: 'Structure and print are being developed for your brief.',
   },
   {
     status: 'sample_shipped',
-    label: 'Sample shipped',
-    blurb: 'Sample is on its way for approval.',
+    label: 'Sample sent',
+    blurb: 'A proof or physical sample is on its way for approval.',
   },
   {
     status: 'sample_approved',
     label: 'Sample approved',
-    blurb: 'Approved — moving into production planning.',
+    blurb: 'Approved — preparing your competitive quote.',
+  },
+  {
+    status: 'quoted',
+    label: 'Competitive quote',
+    blurb: 'Pricing is ready for your review.',
   },
   {
     status: 'in_production',
     label: 'In production',
-    blurb: 'Boxes are being manufactured.',
+    blurb: 'Your packaging is being manufactured.',
   },
   {
     status: 'quality_check',

@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Custom cardboard boxes, made simple. Design your box online, get a quote in 24 hours. From 100 boxes, UK-wide delivery."
+      content="Custom packaging for your brand — boxes, paper bags, food packaging and more. We design, sample, quote competitively and deliver across the UK."
     />
-    <title>unfold — custom cardboard boxes</title>
+    <title>unfold — custom packaging, designed for you</title>
     <link rel="canonical" href="https://unfold.supply/" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta property="og:title" content="unfold — custom cardboard boxes" />
+    <meta property="og:title" content="unfold — custom packaging, designed for you" />
     <meta
       property="og:description"
-      content="Design your box online, get a quote in 24 hours. From 100 boxes, UK-wide delivery."
+      content="Tell us what you need. We design, sample, secure a competitive quote and deliver the finished packaging."
     />
     <meta property="og:url" content="https://unfold.supply/" />
     <meta property="og:type" content="website" />
@@ -31,9 +31,9 @@
       <div class="container header-inner">
         <a href="#" class="logo">unfold</a>
         <nav class="nav" aria-label="Main">
-          <a href="#designer">Design</a>
+          <a href="#products">Products</a>
           <a href="#process">Process</a>
-          <a href="#quote">Quote</a>
+          <a href="#brief">Start</a>
           <a href="/portal.html">Portal</a>
         </nav>
       </div>
@@ -43,21 +43,22 @@
       <section class="hero">
         <div class="hero-copy">
           <p class="hero-brand">unfold</p>
-          <h1>Custom cardboard boxes,<br />made simple.</h1>
+          <h1>Custom packaging,<br />designed for you.</h1>
           <p class="hero-lead">
-            Design your box online. We quote within 24 hours and deliver
-            anywhere in the UK. From 100 boxes.
+            Choose what you need — boxes, bags, food packaging and more.
+            We design it, sample it, secure a competitive quote, and deliver
+            the finished product.
           </p>
           <div class="hero-actions">
-            <a href="#designer" class="btn">Design your box</a>
-            <a href="#quote" class="link-arrow">Or just get a quote</a>
+            <a href="#products" class="btn">What do you need?</a>
+            <a href="#brief" class="link-arrow">Or jump to a brief</a>
           </div>
         </div>
         <div class="hero-visual">
           <img
             class="hero-box"
             src="/hero-unfold-box.png"
-            alt="Custom printed cardboard box with colourful unfold branding"
+            alt="Custom printed packaging with colourful unfold branding"
             width="1600"
             height="900"
             fetchpriority="high"
@@ -65,128 +66,17 @@
         </div>
       </section>
 
-      <section id="designer" class="designer">
+      <section id="products" class="products">
         <div class="container">
           <div class="section-head">
             <span class="section-num">01</span>
-            <h2>Design your box</h2>
+            <h2>What do you need?</h2>
           </div>
-
-          <div class="designer-layout">
-            <div class="designer-panel">
-              <div class="control">
-                <span class="control-label">FEFCO style</span>
-                <div class="fefco-cards" id="fefco-cards" role="listbox" aria-label="FEFCO box style"></div>
-                <p class="control-hint" id="fefco-hint"></p>
-              </div>
-
-              <div class="control">
-                <span class="control-label">Size — mm (internal)</span>
-                <div class="size-inputs">
-                  <label>
-                    L
-                    <input type="number" id="size-l" value="300" min="50" max="1200" />
-                  </label>
-                  <label>
-                    W
-                    <input type="number" id="size-w" value="220" min="50" max="1200" />
-                  </label>
-                  <label>
-                    H
-                    <input type="number" id="size-h" value="150" min="20" max="1200" />
-                  </label>
-                </div>
-              </div>
-
-              <div class="control">
-                <span class="control-label">Board</span>
-                <div class="segment" role="group" aria-label="Board colour">
-                  <button type="button" class="segment-btn active" data-board="kraft" aria-pressed="true">Kraft</button>
-                  <button type="button" class="segment-btn" data-board="white" aria-pressed="false">White</button>
-                </div>
-              </div>
-
-              <div class="control">
-                <span class="control-label">Wall</span>
-                <div class="segment" role="group" aria-label="Wall strength">
-                  <button type="button" class="segment-btn active" data-wall="single" aria-pressed="true">Single</button>
-                  <button type="button" class="segment-btn" data-wall="double" aria-pressed="false">Double</button>
-                </div>
-              </div>
-
-              <div class="control">
-                <span class="control-label">Print</span>
-                <label class="field">
-                  Brand name
-                  <input type="text" id="brand-text" placeholder="Printed on the box" maxlength="40" />
-                </label>
-                <div class="field-row">
-                  <label class="field">
-                    Ink colour
-                    <input type="color" id="ink-color" value="#1a1a1a" />
-                  </label>
-                  <label class="field">
-                    Logo
-                    <input type="file" id="logo-upload" accept="image/*" />
-                  </label>
-                </div>
-              </div>
-
-              <div class="control">
-                <span class="control-label">Quantity</span>
-                <input type="number" id="design-qty" value="250" min="1" step="10" />
-              </div>
-
-              <div class="estimate">
-                <p class="estimate-price" id="estimate-price"></p>
-                <p class="estimate-note" id="estimate-note">Ballpark — confirmed in your quote.</p>
-                <table class="qty-breaks" id="qty-breaks" aria-label="Price by quantity">
-                  <thead>
-                    <tr>
-                      <th>Qty</th>
-                      <th>Per box</th>
-                    </tr>
-                  </thead>
-                  <tbody></tbody>
-                </table>
-              </div>
-
-              <div class="designer-actions">
-                <button type="button" class="btn btn-full" id="send-design">Send design for a quote</button>
-                <button type="button" class="btn btn-outline btn-full" id="download-pdf">Download PDF mockup</button>
-              </div>
-            </div>
-
-            <div class="designer-preview-wrap">
-              <div class="designer-preview" id="design-preview">
-                <div class="preview-hero" id="preview-hero" hidden></div>
-                <div class="preview-stage" id="preview-stage">
-                  <div class="preview-pack" id="preview-pack" data-fefco="0201">
-                    <div class="pack-face face-front">
-                      <img class="pack-logo" id="preview-logo" alt="" hidden />
-                      <span class="pack-brand" id="preview-brand"></span>
-                    </div>
-                    <div class="pack-face face-back"></div>
-                    <div class="pack-face face-right"></div>
-                    <div class="pack-face face-left"></div>
-                    <div class="pack-face face-top">
-                      <span class="flap flap-a"></span>
-                      <span class="flap flap-b"></span>
-                    </div>
-                    <div class="pack-face face-bottom"></div>
-                  </div>
-                  <div class="preview-shadow"></div>
-                </div>
-                <p class="preview-brand-line" id="preview-brand-photo" hidden></p>
-              </div>
-              <div class="preview-meta">
-                <p class="preview-spec" id="preview-spec"></p>
-                <button type="button" class="preview-reset" id="reset-view" hidden>Reset view</button>
-              </div>
-              <p class="preview-hint" id="preview-hint">Drag to rotate</p>
-              <p class="logo-status" id="logo-status" hidden></p>
-            </div>
-          </div>
+          <p class="section-lead">
+            Pick a category to start your brief. We’ll handle the design,
+            sampling and sourcing from there.
+          </p>
+          <div class="product-grid" id="product-grid" role="listbox" aria-label="Packaging type"></div>
         </div>
       </section>
 
@@ -196,24 +86,28 @@
             <span class="section-num">02</span>
             <h2>How it works</h2>
           </div>
-          <ol class="steps">
+          <ol class="steps steps-five">
             <li>
-              <h3>Design</h3>
-              <p>Build your box above, or just tell us what you need.</p>
+              <h3>Tell us</h3>
+              <p>Choose a product type and share sizes, branding and quantity.</p>
             </li>
             <li>
-              <h3>Quote</h3>
-              <p>Pricing within 24 hours. No obligation.</p>
+              <h3>We design</h3>
+              <p>Our team develops structure and print around your brief.</p>
             </li>
             <li>
               <h3>Sample</h3>
-              <p>Approve a proof or physical sample before we go to press.</p>
+              <p>Approve a digital proof or physical sample before production.</p>
             </li>
             <li>
-              <h3>Track &amp; deliver</h3>
+              <h3>Competitive quote</h3>
+              <p>We source and present clear pricing — no obligation.</p>
+            </li>
+            <li>
+              <h3>Deliver</h3>
               <p>
-                Follow production and dispatch in your
-                <a href="/portal.html">customer portal</a>. Boxes arrive flat-packed.
+                We produce and ship. Track every stage in your
+                <a href="/portal.html">customer portal</a>.
               </p>
             </li>
           </ol>
@@ -223,32 +117,33 @@
       <section class="facts">
         <div class="container facts-row">
           <div class="fact">
-            <span class="fact-value">100</span>
-            <span class="fact-label">box minimum order</span>
+            <span class="fact-value">Design</span>
+            <span class="fact-label">structure &amp; print handled for you</span>
           </div>
           <div class="fact">
-            <span class="fact-value">24h</span>
-            <span class="fact-label">quote turnaround</span>
+            <span class="fact-value">Sample</span>
+            <span class="fact-label">approve before you commit</span>
           </div>
           <div class="fact">
-            <span class="fact-value">100%</span>
-            <span class="fact-label">recyclable board</span>
+            <span class="fact-value">UK</span>
+            <span class="fact-label">delivery nationwide</span>
           </div>
         </div>
       </section>
 
-      <section id="quote" class="quote">
+      <section id="brief" class="quote">
         <div class="container">
           <div class="section-head">
             <span class="section-num">03</span>
-            <h2>Get a quote</h2>
+            <h2>Start a project</h2>
           </div>
           <div class="quote-layout">
             <div class="quote-copy">
               <p>
-                Send us your box design or a short description. We reply within
-                one working day.
+                Send a short brief. We’ll come back with next steps on design,
+                sampling and a competitive quote — usually within one working day.
               </p>
+              <p class="quote-selected" id="selected-product-label" hidden></p>
               <div class="quote-contact">
                 <a href="mailto:hello@unfold.supply">hello@unfold.supply</a>
               </div>
@@ -263,9 +158,18 @@
               <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
               <input type="hidden" name="_captcha" value="false" />
               <input type="hidden" name="_template" value="table" />
-              <input type="hidden" name="_next" value="https://unfold.supply/?quote=sent#quote" />
-              <input type="hidden" name="_subject" id="quote-subject" value="Box quote request" />
+              <input type="hidden" name="_next" value="https://unfold.supply/?quote=sent#brief" />
+              <input type="hidden" name="_subject" id="quote-subject" value="Packaging project brief" />
               <input type="hidden" name="_replyto" id="quote-replyto" value="" />
+              <input type="hidden" name="product_type" id="quote-product-type" value="" />
+
+              <label class="field">
+                Product
+                <select name="product" id="quote-product-select" required>
+                  <option value="">Select what you need</option>
+                </select>
+              </label>
+
               <div class="field-row">
                 <label class="field">
                   Name
@@ -276,13 +180,25 @@
                   <input type="email" name="email" required />
                 </label>
               </div>
+              <div class="field-row">
+                <label class="field">
+                  Company
+                  <input type="text" name="company" placeholder="Optional" />
+                </label>
+                <label class="field">
+                  Quantity
+                  <input type="text" name="quantity" placeholder="e.g. 500 / 5,000" />
+                </label>
+              </div>
               <label class="field">
-                Quantity
-                <input type="text" name="quantity" placeholder="e.g. 250" />
-              </label>
-              <label class="field">
-                Message
-                <textarea name="message" id="quote-details" rows="5" placeholder="Box size, print, deadline…"></textarea>
+                Project brief
+                <textarea
+                  name="message"
+                  id="quote-details"
+                  rows="6"
+                  placeholder="Sizes, materials, branding, deadline, anything we should know…"
+                  required
+                ></textarea>
               </label>
               <label class="field file-field">
                 Attachments
@@ -293,10 +209,10 @@
                   multiple
                   accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.svg,.ai,.eps,.zip,.doc,.docx"
                 />
-                <span class="file-hint">Artwork, dielines or briefs — up to 10MB total. With files, you’ll return here after send.</span>
+                <span class="file-hint">Logo, artwork or references — up to 10MB total. With files, you’ll return here after send.</span>
                 <p class="file-list" id="quote-file-list" hidden></p>
               </label>
-              <button type="submit" class="btn btn-full">Send</button>
+              <button type="submit" class="btn btn-full">Send brief</button>
               <p class="form-note" id="form-status" role="status"></p>
             </form>
           </div>
@@ -306,7 +222,7 @@
 
     <footer class="site-footer">
       <div class="container footer-inner">
-        <span>unfold — custom cardboard boxes</span>
+        <span>unfold — custom packaging</span>
         <span>&copy; 2026</span>
       </div>
     </footer>

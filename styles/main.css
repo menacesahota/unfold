@@ -320,7 +320,65 @@ section {
   font-variant-numeric: tabular-nums;
 }
 
-/* Designer */
+.section-lead {
+  margin: -2.5rem 0 2.5rem;
+  max-width: 36rem;
+  color: var(--ink-muted);
+}
+
+/* Products */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.875rem;
+}
+
+.product-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1.25rem 1.35rem;
+  text-align: left;
+  font-family: var(--font);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.product-card:hover {
+  border-color: var(--ink-faint);
+  background: var(--stage);
+}
+
+.product-card.active {
+  border-color: var(--ink);
+  background: var(--stage);
+}
+
+.product-card-title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.product-card-blurb {
+  font-size: 0.875rem;
+  color: var(--ink-muted);
+  line-height: 1.45;
+}
+
+.quote-selected {
+  margin-top: 1rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* Designer (legacy admin tooling pages may still reference) */
 .designer-layout {
   display: grid;
   grid-template-columns: 320px 1fr;
@@ -832,6 +890,11 @@ input[type="file"] {
   counter-reset: step;
 }
 
+.steps-five {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1.5rem;
+}
+
 .steps li {
   counter-increment: step;
   padding-top: 1.25rem;
@@ -1049,6 +1112,14 @@ input[type="file"] {
     grid-template-columns: 1fr 1fr;
   }
 
+  .steps-five {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .product-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
   .quote-layout {
     grid-template-columns: 1fr;
     gap: 2.5rem;
@@ -1082,6 +1153,10 @@ input[type="file"] {
 
   .steps,
   .facts-row {
+    grid-template-columns: 1fr;
+  }
+
+  .product-grid {
     grid-template-columns: 1fr;
   }
 
