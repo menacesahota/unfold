@@ -931,28 +931,51 @@ input[type="file"] {
 
 /* Facts */
 .facts {
-  padding: 4rem 0;
+  padding: 5rem 0;
+  background: var(--stage);
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.facts-kicker {
+  margin: 0 auto 2.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
 }
 
 .facts-row {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  gap: 2.5rem;
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
+.fact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0 0.75rem;
 }
 
 .fact-value {
   display: block;
-  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-size: clamp(2rem, 4.5vw, 2.85rem);
   font-weight: 600;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
   line-height: 1;
-  font-variant-numeric: tabular-nums;
 }
 
 .fact-label {
   display: block;
-  margin-top: 0.625rem;
-  font-size: 0.875rem;
+  margin-top: 0.85rem;
+  max-width: 14rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
   color: var(--ink-muted);
 }
 
