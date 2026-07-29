@@ -6,6 +6,11 @@ services:
     buildCommand: npm run build
     staticPublishPath: dist
     pullRequestPreviewsEnabled: false
+    envVars:
+      - key: VITE_SUPABASE_URL
+        value: https://ozhyjxqjpghfbkyhysll.supabase.co
+      - key: VITE_SUPABASE_ANON_KEY
+        value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im96aHlqeHFqcGdoZmJreWh5c2xsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNDc5MzksImV4cCI6MjEwMDgyMzkzOX0.rvsdeZNGzMVy126DrUwvfE1h8J1pWhfvIxK_vvb5JTg
     headers:
       - path: /*
         name: X-Content-Type-Options
