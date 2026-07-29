@@ -7,7 +7,6 @@ const ordersList = document.getElementById('orders-list');
 const welcomeTitle = document.getElementById('welcome-title');
 const welcomeLead = document.getElementById('welcome-lead');
 const modeBanner = document.getElementById('mode-banner');
-const demoHint = document.getElementById('demo-hint');
 const adminCta = document.getElementById('admin-cta');
 const navAdmin = document.getElementById('nav-admin');
 const navOrders = document.getElementById('nav-orders');
@@ -48,7 +47,7 @@ function renderOrders(orders, profile) {
   if (portalMode === 'demo') {
     modeBanner.hidden = false;
     modeBanner.textContent =
-      'Demo mode — orders are stored in this browser until Supabase is connected on Render.';
+      'Portal storage is local until Supabase is connected on Render.';
   } else {
     modeBanner.hidden = true;
   }
@@ -104,15 +103,6 @@ function showAuth() {
   navOrders.hidden = true;
   navAdmin.hidden = true;
   navSignout.hidden = true;
-
-  if (portalMode === 'demo') {
-    demoHint.hidden = false;
-    demoHint.innerHTML = `
-      Demo login:<br />
-      Customer <code>demo@customer.com</code> / <code>demo1234</code><br />
-      Admin <code>admin@unfold.supply</code> / <code>admin1234</code>
-    `;
-  }
 }
 
 navSignout?.addEventListener('click', async () => {
