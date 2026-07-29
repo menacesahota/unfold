@@ -143,12 +143,18 @@ signupForm?.addEventListener('submit', async (e) => {
   signupStatus.textContent = 'Creating account…';
   const data = new FormData(signupForm);
   try {
-    const { profile } = await portalApi.signUp({
+    const { profile, needsEmailConfirmation } = await portalApi.signUp({
       email: String(data.get('email')),
       password: String(data.get('password')),
       full_name: String(data.get('full_name') || ''),
       company_name: String(data.get('company_name') || ''),
     });
+    if (needsEmailConfirmation || !profile) {
+      signupStatus.textContent =
+        'Account created — check your email and confirm, then sign in.';
+      setTab('signin');
+      return;
+    }
     await showDashboard(profile);
   } catch (err) {
     signupStatus.classList.add('error');

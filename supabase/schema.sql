@@ -111,7 +111,7 @@ begin
     new.email,
     coalesce(new.raw_user_meta_data->>'full_name', ''),
     coalesce(new.raw_user_meta_data->>'company_name', ''),
-    coalesce((new.raw_user_meta_data->>'role')::public.user_role, 'customer')
+    'customer'
   );
   return new;
 end;
@@ -186,3 +186,6 @@ create policy "events write admin"
   on public.order_events for all
   using (public.is_admin())
   with check (public.is_admin());
+
+-- Promote your ops account after first sign-up:
+-- update public.profiles set role = 'admin' where email = 'hello@unfold.supply';

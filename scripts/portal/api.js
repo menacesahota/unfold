@@ -42,11 +42,22 @@ const supabaseApi = {
       email,
       password,
       options: {
-        data: { full_name, company_name, role: 'customer' },
+        data: { full_name, company_name },
+        emailRedirectTo: `${window.location.origin}/portal.html`,
       },
     });
     if (error) throw error;
     if (!data.user) throw new Error('Could not create account.');
+
+    // Email confirmation enabled: no session until they click the link
+    if (!data.session) {
+      return {
+        user: data.user,
+        profile: null,
+        needsEmailConfirmation: true,
+      };
+    }
+
     let profile = null;
     try {
       profile = await getProfile(data.user.id);
@@ -59,7 +70,7 @@ const supabaseApi = {
         role: 'customer',
       };
     }
-    return { user: data.user, profile };
+    return { user: data.user, profile, needsEmailConfirmation: false };
   },
 
   async signOut() {
