@@ -1,35 +1,35 @@
-/** Customer order journey — shared labels and step order */
+/** Customer order journey — free quote → source → supply via unfold */
 
 export const JOURNEY_STEPS = [
   {
     status: 'enquiry',
-    label: 'Brief received',
-    blurb: 'We have your project brief and are reviewing requirements.',
+    label: 'Quote request',
+    blurb: 'We have your details and are reviewing what you need.',
   },
   {
     status: 'sample_in_progress',
-    label: 'Design in progress',
-    blurb: 'Structure and print are being developed for your brief.',
+    label: 'Sourcing',
+    blurb: 'Finding and negotiating with suitable packaging suppliers.',
   },
   {
     status: 'sample_shipped',
-    label: 'Sample sent',
-    blurb: 'A proof or physical sample is on its way for approval.',
+    label: 'Options ready',
+    blurb: 'Supplier options are being finalised for your quote.',
   },
   {
     status: 'sample_approved',
-    label: 'Sample approved',
-    blurb: 'Approved — preparing your competitive quote.',
+    label: 'Spec confirmed',
+    blurb: 'Spec locked — preparing your unfold price.',
   },
   {
     status: 'quoted',
-    label: 'Competitive quote',
-    blurb: 'Pricing is ready for your review.',
+    label: 'Free quote ready',
+    blurb: 'Your unfold price is ready to review — no obligation.',
   },
   {
     status: 'in_production',
-    label: 'In production',
-    blurb: 'Your packaging is being manufactured.',
+    label: 'Order placed',
+    blurb: 'Order confirmed through unfold — production underway.',
   },
   {
     status: 'quality_check',
@@ -44,7 +44,7 @@ export const JOURNEY_STEPS = [
   {
     status: 'delivered',
     label: 'Delivered',
-    blurb: 'Order complete.',
+    blurb: 'Order complete — reorders keep the better pricing.',
   },
 ];
 

@@ -42,7 +42,7 @@ function renderOrders(orders, profile) {
   welcomeLead.textContent =
     profile.role === 'admin'
       ? 'All customer orders. Open any order for the full journey.'
-      : 'Track sample approval, production, dispatch and delivery.';
+      : 'Track sourcing, quotes, orders, production and delivery.';
 
   if (portalMode === 'demo') {
     modeBanner.hidden = false;
