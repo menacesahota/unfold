@@ -21,7 +21,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@8..144,400;8..144,500;8..144,600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=Syne:wght@500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/styles/main.css" />
@@ -41,35 +41,33 @@
 
     <main>
       <section class="hero">
+        <div class="hero-atmosphere" aria-hidden="true"></div>
         <div class="hero-copy">
           <p class="hero-brand">unfold</p>
-          <h1>Are you paying<br />too much for packaging?</h1>
+          <h1>Are you paying too much for packaging?</h1>
           <p class="hero-lead">
-            Get a free quote. Track orders and the prices we’ve negotiated —
-            and see exactly what you save on every run.
+            Free quote. We source suppliers, negotiate the price, and supply
+            through unfold — then show every saving in your portal.
           </p>
           <div class="hero-actions">
             <a href="#brief" class="btn">Get a free quote</a>
             <a href="#savings" class="link-arrow">See example savings</a>
           </div>
         </div>
-        <div class="hero-visual" aria-hidden="true">
-          <div class="portal-preview">
+        <div class="hero-visual">
+          <div class="portal-preview" aria-hidden="true">
             <div class="portal-preview-bar">
-              <span class="portal-preview-dot"></span>
-              <span class="portal-preview-dot"></span>
-              <span class="portal-preview-dot"></span>
-              <span class="portal-preview-title">Customer portal</span>
+              <span class="portal-preview-mark">unfold portal</span>
               <span class="portal-preview-badge">Example</span>
             </div>
             <div class="portal-preview-body">
               <div class="portal-preview-head">
                 <div>
                   <p class="portal-preview-kicker">North Harbour Goods Ltd</p>
-                  <p class="portal-preview-heading">Your packaging orders</p>
+                  <p class="portal-preview-heading">Orders &amp; savings</p>
                 </div>
                 <div class="portal-preview-saved">
-                  <span class="portal-preview-saved-label">Saved with unfold</span>
+                  <span class="portal-preview-saved-label">Saved this year</span>
                   <span class="portal-preview-saved-value">£4,280</span>
                 </div>
               </div>
@@ -77,37 +75,40 @@
                 <li>
                   <div class="ppo-main">
                     <span class="ppo-name">Mailer boxes · 5,000</span>
-                    <span class="ppo-status">Delivered</span>
+                    <span class="ppo-status is-done">Delivered</span>
                   </div>
                   <div class="ppo-prices">
                     <span class="ppo-was">Was £0.48</span>
-                    <span class="ppo-now">£0.36 via unfold</span>
+                    <span class="ppo-now">£0.36</span>
                     <span class="ppo-save">−25%</span>
                   </div>
                 </li>
                 <li>
                   <div class="ppo-main">
                     <span class="ppo-name">Paper carrier bags · 2,000</span>
-                    <span class="ppo-status">In production</span>
+                    <span class="ppo-status is-live">In production</span>
                   </div>
                   <div class="ppo-prices">
                     <span class="ppo-was">Was £0.31</span>
-                    <span class="ppo-now">£0.22 via unfold</span>
+                    <span class="ppo-now">£0.22</span>
                     <span class="ppo-save">−29%</span>
                   </div>
                 </li>
                 <li>
                   <div class="ppo-main">
                     <span class="ppo-name">Stand-up pouches · 10,000</span>
-                    <span class="ppo-status">Quote ready</span>
+                    <span class="ppo-status is-quote">Quote ready</span>
                   </div>
                   <div class="ppo-prices">
                     <span class="ppo-was">Was £0.19</span>
-                    <span class="ppo-now">£0.14 via unfold</span>
+                    <span class="ppo-now">£0.14</span>
                     <span class="ppo-save">−26%</span>
                   </div>
                 </li>
               </ul>
+              <div class="portal-preview-foot">
+                <span>Was → unfold price on every order</span>
+              </div>
             </div>
           </div>
         </div>
@@ -117,20 +118,17 @@
         <div class="container">
           <div class="section-head">
             <span class="section-num">01</span>
-            <h2>Your portal, your prices</h2>
+            <h2>Prices you can see</h2>
           </div>
           <p class="section-lead">
-            Customers see every order, the price they were paying, and the unfold
-            price we achieved — so savings stay visible, not buried in emails.
+            Your portal shows what you were paying, what unfold negotiated, and
+            what you saved — on every run.
           </p>
 
           <div class="savings-board" role="region" aria-label="Example packaging savings">
             <div class="savings-board-top">
               <p class="savings-board-note">Illustrative examples · unit prices ex VAT</p>
-              <p class="savings-board-total">
-                Combined example saving
-                <strong>23–29%</strong>
-              </p>
+              <p class="savings-board-total">Typical saving <strong>23–29%</strong></p>
             </div>
             <div class="savings-table" role="table">
               <div class="savings-row savings-row-head" role="row">
@@ -142,7 +140,7 @@
               <div class="savings-row" role="row">
                 <span role="cell">
                   <strong>Corrugated mailers</strong>
-                  <em>Beauty brand · 8,000 units</em>
+                  <span class="savings-meta">Beauty brand · 8,000 units</span>
                 </span>
                 <span role="cell" class="was">£0.52 / unit</span>
                 <span role="cell" class="now">£0.39 / unit</span>
@@ -151,7 +149,7 @@
               <div class="savings-row" role="row">
                 <span role="cell">
                   <strong>Food-safe cartons</strong>
-                  <em>Snack startup · 12,000 units</em>
+                  <span class="savings-meta">Snack startup · 12,000 units</span>
                 </span>
                 <span role="cell" class="was">£0.28 / unit</span>
                 <span role="cell" class="now">£0.21 / unit</span>
@@ -160,7 +158,7 @@
               <div class="savings-row" role="row">
                 <span role="cell">
                   <strong>Branded paper bags</strong>
-                  <em>Retail chain · 3,000 units</em>
+                  <span class="savings-meta">Retail brand · 3,000 units</span>
                 </span>
                 <span role="cell" class="was">£0.44 / unit</span>
                 <span role="cell" class="now">£0.33 / unit</span>
@@ -169,7 +167,7 @@
               <div class="savings-row" role="row">
                 <span role="cell">
                   <strong>Stand-up pouches</strong>
-                  <em>Coffee roaster · 15,000 units</em>
+                  <span class="savings-meta">Coffee roaster · 15,000 units</span>
                 </span>
                 <span role="cell" class="was">£0.17 / unit</span>
                 <span role="cell" class="now">£0.13 / unit</span>
@@ -177,8 +175,8 @@
               </div>
             </div>
             <div class="savings-cta">
-              <a href="/portal.html" class="btn">Open customer portal</a>
-              <a href="#brief" class="link-arrow">Or get your free quote</a>
+              <a href="#brief" class="btn">Check my packaging price</a>
+              <a href="/portal.html" class="link-arrow">Open the portal</a>
             </div>
           </div>
         </div>
@@ -188,11 +186,11 @@
         <div class="container">
           <div class="section-head">
             <span class="section-num">02</span>
-            <h2>What do you buy?</h2>
+            <h2>What are you buying?</h2>
           </div>
           <p class="section-lead">
-            Pick a category and tell us what you currently pay — or what you need.
-            We’ll come back with a free competitive quote.
+            Choose a category. Tell us what you pay now — or what you need —
+            and we’ll come back with a free unfold quote.
           </p>
           <div class="product-grid" id="product-grid" role="listbox" aria-label="Packaging type"></div>
         </div>
@@ -207,25 +205,25 @@
           <ol class="steps steps-five">
             <li>
               <h3>Tell us</h3>
-              <p>What you need, quantities, and what you’re paying today if you know.</p>
+              <p>What you buy, quantities, and your current price if you have it.</p>
             </li>
             <li>
               <h3>We source</h3>
-              <p>We find suitable packaging suppliers and negotiate on your behalf.</p>
+              <p>We find suppliers and negotiate packaging pricing on your behalf.</p>
             </li>
             <li>
               <h3>Free quote</h3>
-              <p>You get a clear unfold price — no obligation, nothing to pay for the quote.</p>
+              <p>You get a clear unfold price. No fee. No obligation.</p>
             </li>
             <li>
               <h3>Order through us</h3>
-              <p>Place the order with unfold. We handle the supplier relationship end to end.</p>
+              <p>Place the order with unfold. We manage the supplier end to end.</p>
             </li>
             <li>
-              <h3>Track in portal</h3>
+              <h3>Track savings</h3>
               <p>
-                See orders, negotiated prices and savings in your
-                <a href="/portal.html">customer portal</a>.
+                Orders, negotiated prices and savings live in your
+                <a href="/portal.html">portal</a>.
               </p>
             </li>
           </ol>
@@ -234,19 +232,19 @@
 
       <section class="facts">
         <div class="container">
-          <p class="facts-kicker">What you get with unfold</p>
+          <p class="facts-kicker">Why brands use unfold</p>
           <div class="facts-row">
             <div class="fact">
-              <span class="fact-value">Free quote</span>
-              <span class="fact-label">No fee to find out if you’re overpaying</span>
+              <span class="fact-value">Free</span>
+              <span class="fact-label">Quote first. Find out if you’re overpaying.</span>
             </div>
             <div class="fact">
-              <span class="fact-value">Portal</span>
-              <span class="fact-label">See orders, negotiated prices and savings</span>
+              <span class="fact-value">Sourced</span>
+              <span class="fact-label">We negotiate. You don’t chase factories.</span>
             </div>
             <div class="fact">
-              <span class="fact-value">Supply</span>
-              <span class="fact-label">Order through unfold and keep saving on reorders</span>
+              <span class="fact-value">Visible</span>
+              <span class="fact-label">Savings stay clear in the customer portal.</span>
             </div>
           </div>
         </div>
@@ -261,12 +259,13 @@
           <div class="quote-layout">
             <div class="quote-copy">
               <p>
-                Send what you’re buying (and what you pay now, if you can).
+                Send what you’re buying and what you pay today.
                 We’ll source options and reply with a free unfold quote —
                 usually within one working day.
               </p>
               <p class="quote-selected" id="selected-product-label" hidden></p>
               <div class="quote-contact">
+                <span class="quote-contact-label">Or email directly</span>
                 <a href="mailto:hello@unfold.supply">hello@unfold.supply</a>
               </div>
             </div>
@@ -295,17 +294,17 @@
               <div class="field-row">
                 <label class="field">
                   Name
-                  <input type="text" name="name" required />
+                  <input type="text" name="name" required autocomplete="name" />
                 </label>
                 <label class="field">
                   Email
-                  <input type="email" name="email" required />
+                  <input type="email" name="email" required autocomplete="email" />
                 </label>
               </div>
               <div class="field-row">
                 <label class="field">
                   Company
-                  <input type="text" name="company" placeholder="Optional" />
+                  <input type="text" name="company" placeholder="Optional" autocomplete="organization" />
                 </label>
                 <label class="field">
                   Quantity
@@ -313,7 +312,7 @@
                 </label>
               </div>
               <label class="field">
-                Current price <span class="field-optional">(optional)</span>
+                Current price <span class="field-optional">optional</span>
                 <input
                   type="text"
                   name="current_price"
@@ -326,7 +325,7 @@
                   name="message"
                   id="quote-details"
                   rows="5"
-                  placeholder="Product type, sizes, material, branding, and anything else we should know…"
+                  placeholder="Product type, sizes, material, branding, deadline…"
                   required
                 ></textarea>
               </label>
@@ -339,7 +338,7 @@
                   multiple
                   accept=".pdf,.png,.jpg,.jpeg,.webp,.gif,.svg,.ai,.eps,.zip,.doc,.docx"
                 />
-                <span class="file-hint">Invoice, spec or artwork — up to 10MB total. With files, you’ll return here after send.</span>
+                <span class="file-hint">Invoice, spec or artwork — up to 10MB total.</span>
                 <p class="file-list" id="quote-file-list" hidden></p>
               </label>
               <button type="submit" class="btn btn-full">Get my free quote</button>
@@ -352,8 +351,10 @@
 
     <footer class="site-footer">
       <div class="container footer-inner">
-        <span>unfold — packaging sourcing</span>
-        <span>&copy; 2026</span>
+        <span class="footer-brand">unfold</span>
+        <span class="footer-tag">Packaging sourcing for UK brands</span>
+        <a href="mailto:hello@unfold.supply">hello@unfold.supply</a>
+        <span class="footer-copy">&copy; 2026</span>
       </div>
     </footer>
 

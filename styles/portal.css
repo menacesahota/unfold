@@ -1,21 +1,22 @@
 /* unfold customer portal */
 
 :root {
-  --ink: #111110;
-  --ink-muted: #6b6b66;
-  --ink-faint: #9c9c96;
-  --paper: #ffffff;
-  --stage: #f4f3f0;
-  --line: #e7e6e2;
-  --line-strong: #d4d2cc;
-  --good: #1f6b45;
-  --good-soft: #e8f4ec;
+  --ink: #12110f;
+  --ink-muted: #5c5a55;
+  --ink-faint: #8f8c85;
+  --paper: #fbfaf7;
+  --stage: #efebe3;
+  --line: #e2ddd4;
+  --line-strong: #cfc8bc;
+  --good: #1a6b45;
+  --good-soft: #e7f3ec;
   --warn: #8a5a12;
   --warn-soft: #f8f0e2;
-  --accent: #c45c3a;
-  --font: "Inter", system-ui, sans-serif;
+  --accent: #a8895c;
+  --font: "DM Sans", system-ui, sans-serif;
+  --display: "Syne", "DM Sans", system-ui, sans-serif;
   --container: 1040px;
-  --header-h: 68px;
+  --header-h: 72px;
 }
 
 *,
@@ -79,9 +80,10 @@ textarea {
 }
 
 .logo {
-  font-size: 1.125rem;
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-family: var(--display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
 }
 
 .nav {
@@ -115,7 +117,7 @@ textarea {
   color: var(--paper);
   background: var(--ink);
   border: 1px solid var(--ink);
-  border-radius: 999px;
+  border-radius: 6px;
   cursor: pointer;
   transition: opacity 0.2s;
 }
@@ -158,9 +160,10 @@ textarea {
 
 .portal-title {
   margin: 0;
+  font-family: var(--display);
   font-size: clamp(1.75rem, 4vw, 2.5rem);
-  font-weight: 600;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  letter-spacing: -0.035em;
   line-height: 1.15;
 }
 
@@ -189,8 +192,9 @@ textarea {
 
 .auth-copy h1 {
   margin: 0;
+  font-family: var(--display);
   font-size: clamp(2rem, 5vw, 3.25rem);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.05;
 }
@@ -217,7 +221,7 @@ textarea {
   flex: 1;
   padding: 0.625rem 0.75rem;
   border: 1px solid var(--line-strong);
-  border-radius: 999px;
+  border-radius: 6px;
   background: transparent;
   color: var(--ink-muted);
   cursor: pointer;
