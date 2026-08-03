@@ -605,7 +605,8 @@ p {
 }
 
 .sourcing-map-figure {
-  margin: 0;
+  margin: 0 auto;
+  max-width: min(520px, 72%);
 }
 
 .sourcing-map-img {
@@ -614,12 +615,6 @@ p {
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--paper-deep);
-}
-
-.sourcing-map-caption {
-  margin-top: 0.85rem;
-  font-size: 0.8rem;
-  color: var(--ink-faint);
 }
 
 .hero-box {
@@ -1545,6 +1540,25 @@ input[type="file"] {
 
 .footer-copy {
   margin-left: auto;
+}
+
+.footer-credit {
+  margin-top: 1.15rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+.footer-credit a {
+  color: var(--ink-muted);
+  border-bottom: 1px solid transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.footer-credit a:hover {
+  color: var(--ink);
+  border-color: var(--ink);
 }
 
 /* Mobile */
