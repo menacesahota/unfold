@@ -13,8 +13,8 @@
   --warn: #8a5a12;
   --warn-soft: #f8f0e2;
   --accent: #a8895c;
-  --font: "DM Sans", system-ui, sans-serif;
-  --display: "Syne", "DM Sans", system-ui, sans-serif;
+  --font: "Inter", system-ui, sans-serif;
+  --display: "Inter", system-ui, sans-serif;
   --container: 1040px;
   --header-h: 72px;
 }
