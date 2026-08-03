@@ -50,14 +50,11 @@ Open `/portal.html` — demo credentials should be gone.
 
 ## 6. Render (production)
 
-In the Render service → **Environment**:
+Production builds load **`.env.production`** (committed public anon keys) so Render
+always embeds Supabase — you should not need dashboard env vars for the portal.
 
-| Key | Value |
-|---|---|
-| `VITE_SUPABASE_URL` | your project URL |
-| `VITE_SUPABASE_ANON_KEY` | your anon key |
-
-Trigger a **clear build / redeploy** so Vite embeds the vars.
+If the site still shows “Portal storage is local…”, trigger a **clear cache and
+redeploy** on Render after pushing `.env.production`.
 
 ## 7. Create your admin account
 
