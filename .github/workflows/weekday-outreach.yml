@@ -1,0 +1,40 @@
+name: Weekday packaging outreach
+
+on:
+  schedule:
+    # 09:00 UK: 08:00 UTC in BST, 09:00 UTC in GMT.
+    # Using 08:00 UTC (9am BST / 8am GMT) — acceptable year-round.
+    - cron: "0 8 * * 1-5"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  outreach:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Send daily outreach
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+        run: node outreach/send-daily.mjs
+
+      - name: Commit outreach data
+        run: |
+          git config user.name "unfold-outreach"
+          git config user.email "hello@unfold.supply"
+          git add outreach/data/sent.jsonl outreach/data/prospects-queue.json
+          if git diff --staged --quiet; then
+            echo "No log changes"
+          else
+            git commit -m "chore: outreach send log"
+            git push
+          fi
