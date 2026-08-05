@@ -1,77 +1,377 @@
 [
-  {"company": "Handmade Naturals", "website": "https://handmadenaturals.co.uk", "category": "skincare"},
-  {"company": "BAO Skincare", "website": "https://www.baoskincare.co.uk", "category": "skincare"},
-  {"company": "Willow & Birch", "website": "https://www.willowandbirch.co.uk", "category": "skincare"},
-  {"company": "BareDream", "website": "https://www.baredream.co.uk", "category": "skincare"},
-  {"company": "Scence", "website": "https://scence.co.uk", "category": "skincare"},
-  {"company": "Balance Me", "website": "https://www.balanceme.com", "category": "skincare"},
-  {"company": "Green People", "website": "https://www.greenpeople.co.uk", "category": "skincare"},
-  {"company": "Tropic Skincare", "website": "https://www.tropicskincare.com", "category": "skincare"},
-  {"company": "This Works", "website": "https://www.thisworks.com", "category": "skincare"},
-  {"company": "UpCircle", "website": "https://upcirclebeauty.com", "category": "skincare"},
-  {"company": "Faith In Nature", "website": "https://www.faithinnature.co.uk", "category": "personal-care"},
-  {"company": "Friendly Soap", "website": "https://www.friendlysoap.co.uk", "category": "personal-care"},
-  {"company": "Lazy Scientist Sauces", "website": "https://www.lazyscientistsauces.co.uk", "category": "food"},
-  {"company": "Legendary Sauce Co", "website": "https://legendarysaucecompany.co.uk", "category": "food"},
-  {"company": "Kickin' Chilli", "website": "https://kickinchilli.co.uk", "category": "food"},
-  {"company": "Easton Chilli", "website": "https://eastonchilli.com", "category": "food"},
-  {"company": "Harry's Hot Chocolate", "website": "https://harryshotchocolate.co.uk", "category": "food"},
-  {"company": "Halen Môn", "website": "https://www.halenmon.com", "category": "food"},
-  {"company": "Tracklements", "website": "https://www.tracklements.co.uk", "category": "food"},
-  {"company": "Mr Vikki's", "website": "https://www.mrvikkis.com", "category": "food"},
-  {"company": "Ombar", "website": "https://www.ombar.co.uk", "category": "chocolate"},
-  {"company": "Love Cocoa", "website": "https://lovecocoa.com", "category": "chocolate"},
-  {"company": "Montezuma's", "website": "https://www.montezumas.co.uk", "category": "chocolate"},
-  {"company": "Seed & Bean", "website": "https://www.seedandbean.co.uk", "category": "chocolate"},
-  {"company": "Bird & Blend Tea", "website": "https://www.birdandblendtea.com", "category": "tea"},
-  {"company": "Rare Tea Company", "website": "https://www.rareteacompany.com", "category": "tea"},
-  {"company": "The Soy Wax Candle Company", "website": "https://www.soywaxcandlecompany.co.uk", "category": "candles"},
-  {"company": "Carly's Candle Company", "website": "https://www.carlyscandlecompany.co.uk", "category": "candles"},
-  {"company": "The Natural Soy Candle Shop", "website": "https://thenaturalsoycandleshop.co.uk", "category": "candles"},
-  {"company": "Sofasoy Candles", "website": "https://www.sofasoycandles.com", "category": "candles"},
-  {"company": "St Eval Candle Company", "website": "https://www.stevalcandlecompany.co.uk", "category": "candles"},
-  {"company": "True Grace", "website": "https://www.truegrace.co.uk", "category": "candles"},
-  {"company": "Earl of East", "website": "https://www.earlofeast.com", "category": "candles"},
-  {"company": "Extract Coffee Roasters", "website": "https://extractcoffee.co.uk", "category": "coffee"},
-  {"company": "Element Coffee", "website": "https://elementcoffee.co.uk", "category": "coffee"},
-  {"company": "Copper Coffee Roasters", "website": "https://coppercoffeeroasters.co.uk", "category": "coffee"},
-  {"company": "Tribe", "website": "https://wearetribe.co", "category": "food"},
-  {"company": "Pulsin", "website": "https://www.pulsin.co.uk", "category": "food"},
-  {"company": "Square Root Soda", "website": "https://www.squarerootsoda.com", "category": "drinks"},
-  {"company": "Dalston's Soda", "website": "https://dalstonssoda.com", "category": "drinks"},
-  {"company": "Karma Cola", "website": "https://www.karmacola.co.uk", "category": "drinks"},
-  {"company": "Belvoir Farm", "website": "https://www.belvoirfarm.co.uk", "category": "drinks"},
-  {"company": "Cawston Press", "website": "https://www.cawstonpress.com", "category": "drinks"},
-  {"company": "Pip Organic", "website": "https://www.piporganic.com", "category": "drinks"},
-  {"company": "Scrumbles", "website": "https://www.scrumbles.co.uk", "category": "pet"},
-  {"company": "Barking Heads", "website": "https://www.barkingheads.co.uk", "category": "pet"},
-  {"company": "Natural Instinct", "website": "https://www.naturalinstinct.com", "category": "pet"},
-  {"company": "Pet Treat Kitchen", "website": "https://www.pettreatkitchen.co.uk", "category": "pet"},
-  {"company": "Bloom & Blossom", "website": "https://www.bloomandblossom.co.uk", "category": "baby"},
-  {"company": "Kit & Kin", "website": "https://www.kitandkin.com", "category": "baby"},
-  {"company": "Bambino Mio", "website": "https://www.bambinomio.com", "category": "baby"},
-  {"company": "TotsBots", "website": "https://www.totsbots.com", "category": "baby"},
-  {"company": "Frugi", "website": "https://www.welovefrugi.com", "category": "baby-fashion"},
-  {"company": "Rapanui", "website": "https://rapanuiclothing.com", "category": "fashion"},
-  {"company": "People Tree", "website": "https://www.peopletree.co.uk", "category": "fashion"},
-  {"company": "Thought Clothing", "website": "https://www.wearethought.com", "category": "fashion"},
-  {"company": "Know The Origin", "website": "https://www.knowtheorigin.com", "category": "fashion"},
-  {"company": "With Nothing Underneath", "website": "https://www.withnothingunderneath.com", "category": "fashion"},
-  {"company": "Seasalt Cornwall", "website": "https://www.seasaltcornwall.com", "category": "fashion"},
-  {"company": "Finisterre", "website": "https://finisterre.com", "category": "fashion"},
-  {"company": "Solovair", "website": "https://www.solovair.co.uk", "category": "fashion"},
-  {"company": "Cheeky Panda", "website": "https://www.cheekypanda.com", "category": "home"},
-  {"company": "Bumboo", "website": "https://www.bumboo.eco", "category": "home"},
-  {"company": "Smol", "website": "https://smolproducts.com", "category": "home"},
-  {"company": "Garden Trading", "website": "https://www.gardentrading.co.uk", "category": "home"},
-  {"company": "Percy & Reed", "website": "https://www.percyandreed.com", "category": "hair"},
-  {"company": "Grow Gorgeous", "website": "https://www.growgorgeous.co.uk", "category": "hair"},
-  {"company": "Josh Wood Colour", "website": "https://www.joshwoodcolour.com", "category": "hair"},
-  {"company": "Cowshed", "website": "https://www.cowshed.com", "category": "personal-care"},
-  {"company": "Aromatherapy Associates", "website": "https://www.aromatherapyassociates.com", "category": "personal-care"},
-  {"company": "Childs Farm", "website": "https://www.childsfarm.com", "category": "baby"},
-  {"company": "Piccolo", "website": "https://www.mylittlepiccolo.com", "category": "baby"},
-  {"company": "Little Freddie", "website": "https://www.littlefreddie.com", "category": "baby"},
-  {"company": "Bounce Foods", "website": "https://www.bouncefoods.com", "category": "food"},
-  {"company": "Pipers Crisps", "website": "https://www.piperscrisps.com", "category": "food"}
+  {
+    "company": "BAO Skincare",
+    "website": "https://www.baoskincare.co.uk",
+    "category": "skincare"
+  },
+  {
+    "company": "BareDream",
+    "website": "https://www.baredream.co.uk",
+    "category": "skincare"
+  },
+  {
+    "company": "Scence",
+    "website": "https://scence.co.uk",
+    "category": "skincare"
+  },
+  {
+    "company": "Green People",
+    "website": "https://www.greenpeople.co.uk",
+    "category": "skincare"
+  },
+  {
+    "company": "Tropic Skincare",
+    "website": "https://www.tropicskincare.com",
+    "category": "skincare"
+  },
+  {
+    "company": "Handmade Naturals",
+    "website": "https://handmadenaturals.co.uk",
+    "category": "skincare"
+  },
+  {
+    "company": "Willow & Birch",
+    "website": "https://www.willowandbirch.co.uk",
+    "category": "skincare"
+  },
+  {
+    "company": "Balance Me",
+    "website": "https://www.balanceme.com",
+    "category": "skincare"
+  },
+  {
+    "company": "This Works",
+    "website": "https://www.thisworks.com",
+    "category": "skincare"
+  },
+  {
+    "company": "UpCircle",
+    "website": "https://upcirclebeauty.com",
+    "category": "skincare"
+  },
+  {
+    "company": "Faith In Nature",
+    "website": "https://www.faithinnature.co.uk",
+    "category": "personal-care"
+  },
+  {
+    "company": "Friendly Soap",
+    "website": "https://www.friendlysoap.co.uk",
+    "category": "personal-care"
+  },
+  {
+    "company": "Lazy Scientist Sauces",
+    "website": "https://www.lazyscientistsauces.co.uk",
+    "category": "food"
+  },
+  {
+    "company": "Legendary Sauce Co",
+    "website": "https://legendarysaucecompany.co.uk",
+    "category": "food"
+  },
+  {
+    "company": "Kickin' Chilli",
+    "website": "https://kickinchilli.co.uk",
+    "category": "food"
+  },
+  {
+    "company": "Easton Chilli",
+    "website": "https://eastonchilli.com",
+    "category": "food"
+  },
+  {
+    "company": "Harry's Hot Chocolate",
+    "website": "https://harryshotchocolate.co.uk",
+    "category": "food"
+  },
+  {
+    "company": "Halen Môn",
+    "website": "https://www.halenmon.com",
+    "category": "food"
+  },
+  {
+    "company": "Tracklements",
+    "website": "https://www.tracklements.co.uk",
+    "category": "food"
+  },
+  {
+    "company": "Mr Vikki's",
+    "website": "https://www.mrvikkis.com",
+    "category": "food"
+  },
+  {
+    "company": "Ombar",
+    "website": "https://www.ombar.co.uk",
+    "category": "chocolate"
+  },
+  {
+    "company": "Love Cocoa",
+    "website": "https://lovecocoa.com",
+    "category": "chocolate"
+  },
+  {
+    "company": "Montezuma's",
+    "website": "https://www.montezumas.co.uk",
+    "category": "chocolate"
+  },
+  {
+    "company": "Seed & Bean",
+    "website": "https://www.seedandbean.co.uk",
+    "category": "chocolate"
+  },
+  {
+    "company": "Bird & Blend Tea",
+    "website": "https://www.birdandblendtea.com",
+    "category": "tea"
+  },
+  {
+    "company": "Rare Tea Company",
+    "website": "https://www.rareteacompany.com",
+    "category": "tea"
+  },
+  {
+    "company": "The Soy Wax Candle Company",
+    "website": "https://www.soywaxcandlecompany.co.uk",
+    "category": "candles"
+  },
+  {
+    "company": "Carly's Candle Company",
+    "website": "https://www.carlyscandlecompany.co.uk",
+    "category": "candles"
+  },
+  {
+    "company": "The Natural Soy Candle Shop",
+    "website": "https://thenaturalsoycandleshop.co.uk",
+    "category": "candles"
+  },
+  {
+    "company": "Sofasoy Candles",
+    "website": "https://www.sofasoycandles.com",
+    "category": "candles"
+  },
+  {
+    "company": "St Eval Candle Company",
+    "website": "https://www.stevalcandlecompany.co.uk",
+    "category": "candles"
+  },
+  {
+    "company": "True Grace",
+    "website": "https://www.truegrace.co.uk",
+    "category": "candles"
+  },
+  {
+    "company": "Earl of East",
+    "website": "https://www.earlofeast.com",
+    "category": "candles"
+  },
+  {
+    "company": "Extract Coffee Roasters",
+    "website": "https://extractcoffee.co.uk",
+    "category": "coffee"
+  },
+  {
+    "company": "Element Coffee",
+    "website": "https://elementcoffee.co.uk",
+    "category": "coffee"
+  },
+  {
+    "company": "Copper Coffee Roasters",
+    "website": "https://coppercoffeeroasters.co.uk",
+    "category": "coffee"
+  },
+  {
+    "company": "Tribe",
+    "website": "https://wearetribe.co",
+    "category": "food"
+  },
+  {
+    "company": "Pulsin",
+    "website": "https://www.pulsin.co.uk",
+    "category": "food"
+  },
+  {
+    "company": "Square Root Soda",
+    "website": "https://www.squarerootsoda.com",
+    "category": "drinks"
+  },
+  {
+    "company": "Dalston's Soda",
+    "website": "https://dalstonssoda.com",
+    "category": "drinks"
+  },
+  {
+    "company": "Karma Cola",
+    "website": "https://www.karmacola.co.uk",
+    "category": "drinks"
+  },
+  {
+    "company": "Belvoir Farm",
+    "website": "https://www.belvoirfarm.co.uk",
+    "category": "drinks"
+  },
+  {
+    "company": "Cawston Press",
+    "website": "https://www.cawstonpress.com",
+    "category": "drinks"
+  },
+  {
+    "company": "Pip Organic",
+    "website": "https://www.piporganic.com",
+    "category": "drinks"
+  },
+  {
+    "company": "Scrumbles",
+    "website": "https://www.scrumbles.co.uk",
+    "category": "pet"
+  },
+  {
+    "company": "Barking Heads",
+    "website": "https://www.barkingheads.co.uk",
+    "category": "pet"
+  },
+  {
+    "company": "Natural Instinct",
+    "website": "https://www.naturalinstinct.com",
+    "category": "pet"
+  },
+  {
+    "company": "Pet Treat Kitchen",
+    "website": "https://www.pettreatkitchen.co.uk",
+    "category": "pet"
+  },
+  {
+    "company": "Bloom & Blossom",
+    "website": "https://www.bloomandblossom.co.uk",
+    "category": "baby"
+  },
+  {
+    "company": "Kit & Kin",
+    "website": "https://www.kitandkin.com",
+    "category": "baby"
+  },
+  {
+    "company": "Bambino Mio",
+    "website": "https://www.bambinomio.com",
+    "category": "baby"
+  },
+  {
+    "company": "TotsBots",
+    "website": "https://www.totsbots.com",
+    "category": "baby"
+  },
+  {
+    "company": "Frugi",
+    "website": "https://www.welovefrugi.com",
+    "category": "baby-fashion"
+  },
+  {
+    "company": "Rapanui",
+    "website": "https://rapanuiclothing.com",
+    "category": "fashion"
+  },
+  {
+    "company": "People Tree",
+    "website": "https://www.peopletree.co.uk",
+    "category": "fashion"
+  },
+  {
+    "company": "Thought Clothing",
+    "website": "https://www.wearethought.com",
+    "category": "fashion"
+  },
+  {
+    "company": "Know The Origin",
+    "website": "https://www.knowtheorigin.com",
+    "category": "fashion"
+  },
+  {
+    "company": "With Nothing Underneath",
+    "website": "https://www.withnothingunderneath.com",
+    "category": "fashion"
+  },
+  {
+    "company": "Seasalt Cornwall",
+    "website": "https://www.seasaltcornwall.com",
+    "category": "fashion"
+  },
+  {
+    "company": "Finisterre",
+    "website": "https://finisterre.com",
+    "category": "fashion"
+  },
+  {
+    "company": "Solovair",
+    "website": "https://www.solovair.co.uk",
+    "category": "fashion"
+  },
+  {
+    "company": "Cheeky Panda",
+    "website": "https://www.cheekypanda.com",
+    "category": "home"
+  },
+  {
+    "company": "Bumboo",
+    "website": "https://www.bumboo.eco",
+    "category": "home"
+  },
+  {
+    "company": "Smol",
+    "website": "https://smolproducts.com",
+    "category": "home"
+  },
+  {
+    "company": "Garden Trading",
+    "website": "https://www.gardentrading.co.uk",
+    "category": "home"
+  },
+  {
+    "company": "Percy & Reed",
+    "website": "https://www.percyandreed.com",
+    "category": "hair"
+  },
+  {
+    "company": "Grow Gorgeous",
+    "website": "https://www.growgorgeous.co.uk",
+    "category": "hair"
+  },
+  {
+    "company": "Josh Wood Colour",
+    "website": "https://www.joshwoodcolour.com",
+    "category": "hair"
+  },
+  {
+    "company": "Cowshed",
+    "website": "https://www.cowshed.com",
+    "category": "personal-care"
+  },
+  {
+    "company": "Aromatherapy Associates",
+    "website": "https://www.aromatherapyassociates.com",
+    "category": "personal-care"
+  },
+  {
+    "company": "Childs Farm",
+    "website": "https://www.childsfarm.com",
+    "category": "baby"
+  },
+  {
+    "company": "Piccolo",
+    "website": "https://www.mylittlepiccolo.com",
+    "category": "baby"
+  },
+  {
+    "company": "Little Freddie",
+    "website": "https://www.littlefreddie.com",
+    "category": "baby"
+  },
+  {
+    "company": "Bounce Foods",
+    "website": "https://www.bouncefoods.com",
+    "category": "food"
+  },
+  {
+    "company": "Pipers Crisps",
+    "website": "https://www.piperscrisps.com",
+    "category": "food"
+  }
 ]
