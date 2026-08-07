@@ -22,19 +22,17 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Send daily outreach
-        env:
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      - name: Draft daily outreach
         run: node outreach/send-daily.mjs
 
       - name: Commit outreach data
         run: |
           git config user.name "unfold-outreach"
           git config user.email "hello@unfold.supply"
-          git add outreach/data/sent.jsonl outreach/data/prospects-queue.json
+          git add outreach/data/sent.jsonl outreach/data/prospects-queue.json outreach/data/outbox.jsonl
           if git diff --staged --quiet; then
             echo "No log changes"
           else
-            git commit -m "chore: outreach send log"
+            git commit -m "chore: outreach draft log"
             git push
           fi
