@@ -15,23 +15,8 @@
     "category": "skincare"
   },
   {
-    "company": "This Works",
-    "website": "https://www.thisworks.com",
-    "category": "skincare"
-  },
-  {
-    "company": "UpCircle",
-    "website": "https://upcirclebeauty.com",
-    "category": "skincare"
-  },
-  {
     "company": "Faith In Nature",
     "website": "https://www.faithinnature.co.uk",
-    "category": "personal-care"
-  },
-  {
-    "company": "Friendly Soap",
-    "website": "https://www.friendlysoap.co.uk",
     "category": "personal-care"
   },
   {
@@ -42,16 +27,6 @@
   {
     "company": "Legendary Sauce Co",
     "website": "https://legendarysaucecompany.co.uk",
-    "category": "food"
-  },
-  {
-    "company": "Kickin' Chilli",
-    "website": "https://kickinchilli.co.uk",
-    "category": "food"
-  },
-  {
-    "company": "Easton Chilli",
-    "website": "https://eastonchilli.com",
     "category": "food"
   },
   {
