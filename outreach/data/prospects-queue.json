@@ -30,11 +30,6 @@
     "category": "food"
   },
   {
-    "company": "Harry's Hot Chocolate",
-    "website": "https://harryshotchocolate.co.uk",
-    "category": "food"
-  },
-  {
     "company": "Halen Môn",
     "website": "https://www.halenmon.com",
     "category": "food"
@@ -48,26 +43,6 @@
     "company": "Mr Vikki's",
     "website": "https://www.mrvikkis.com",
     "category": "food"
-  },
-  {
-    "company": "Ombar",
-    "website": "https://www.ombar.co.uk",
-    "category": "chocolate"
-  },
-  {
-    "company": "Love Cocoa",
-    "website": "https://lovecocoa.com",
-    "category": "chocolate"
-  },
-  {
-    "company": "Montezuma's",
-    "website": "https://www.montezumas.co.uk",
-    "category": "chocolate"
-  },
-  {
-    "company": "Seed & Bean",
-    "website": "https://www.seedandbean.co.uk",
-    "category": "chocolate"
   },
   {
     "company": "Bird & Blend Tea",
