@@ -45,11 +45,6 @@
     "category": "food"
   },
   {
-    "company": "Bird & Blend Tea",
-    "website": "https://www.birdandblendtea.com",
-    "category": "tea"
-  },
-  {
     "company": "Rare Tea Company",
     "website": "https://www.rareteacompany.com",
     "category": "tea"
@@ -60,11 +55,6 @@
     "category": "candles"
   },
   {
-    "company": "Carly's Candle Company",
-    "website": "https://www.carlyscandlecompany.co.uk",
-    "category": "candles"
-  },
-  {
     "company": "The Natural Soy Candle Shop",
     "website": "https://thenaturalsoycandleshop.co.uk",
     "category": "candles"
@@ -72,21 +62,6 @@
   {
     "company": "Sofasoy Candles",
     "website": "https://www.sofasoycandles.com",
-    "category": "candles"
-  },
-  {
-    "company": "St Eval Candle Company",
-    "website": "https://www.stevalcandlecompany.co.uk",
-    "category": "candles"
-  },
-  {
-    "company": "True Grace",
-    "website": "https://www.truegrace.co.uk",
-    "category": "candles"
-  },
-  {
-    "company": "Earl of East",
-    "website": "https://www.earlofeast.com",
     "category": "candles"
   },
   {
