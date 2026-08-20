@@ -20,11 +20,6 @@
     "category": "personal-care"
   },
   {
-    "company": "Lazy Scientist Sauces",
-    "website": "https://www.lazyscientistsauces.co.uk",
-    "category": "food"
-  },
-  {
     "company": "Legendary Sauce Co",
     "website": "https://legendarysaucecompany.co.uk",
     "category": "food"
@@ -108,26 +103,6 @@
     "company": "People Tree",
     "website": "https://www.peopletree.co.uk",
     "category": "fashion"
-  },
-  {
-    "company": "Bumboo",
-    "website": "https://www.bumboo.eco",
-    "category": "home"
-  },
-  {
-    "company": "Smol",
-    "website": "https://smolproducts.com",
-    "category": "home"
-  },
-  {
-    "company": "Garden Trading",
-    "website": "https://www.gardentrading.co.uk",
-    "category": "home"
-  },
-  {
-    "company": "Percy & Reed",
-    "website": "https://www.percyandreed.com",
-    "category": "hair"
   },
   {
     "company": "Grow Gorgeous",
