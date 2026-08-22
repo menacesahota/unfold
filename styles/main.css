@@ -724,6 +724,7 @@ section {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   cursor: pointer;
+  color: inherit;
   transition: border-color 0.2s, background 0.2s, transform 0.2s;
 }
 

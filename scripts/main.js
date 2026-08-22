@@ -268,7 +268,18 @@ if (new URLSearchParams(window.location.search).get('quote') === 'sent') {
 
 renderProducts();
 
-const hashProduct = new URLSearchParams(window.location.search).get('product');
+const params = new URLSearchParams(window.location.search);
+const hashProduct = params.get('product');
 if (hashProduct && productById(hashProduct)) {
   setProduct(hashProduct);
+}
+
+const storedBrief = sessionStorage.getItem('unfold-spec-brief');
+if (storedBrief) {
+  const details = document.getElementById('quote-details');
+  if (details && !String(details.value || '').trim()) {
+    details.value = storedBrief;
+  }
+  sessionStorage.removeItem('unfold-spec-brief');
+  if (!hashProduct) setProduct('boxes');
 }

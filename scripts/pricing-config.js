@@ -50,8 +50,9 @@ export const DEFAULT_PRICING = {
     double: { label: 'Double wall', priceFactor: 1.4 },
   },
 
-  // Core live-quote styles (same set as Kite / industry calculators)
+  // Style multipliers (spec engine + quote formula). Featured four are the live quote cards.
   fefco: {
+    '0200': { label: '0200 — Half slotted (HSC)', shortLabel: '0200', priceFactor: 0.92 },
     '0201': {
       label: '0201 — Regular slotted (RSC)',
       shortLabel: '0201',
@@ -60,6 +61,7 @@ export const DEFAULT_PRICING = {
       priceFactor: 1,
       featured: true,
     },
+    '0202': { label: '0202 — Overlap slotted (OSC)', shortLabel: '0202', priceFactor: 1.08 },
     '0203': {
       label: '0203 — Full overlap (FOL)',
       shortLabel: '0203',
@@ -68,22 +70,35 @@ export const DEFAULT_PRICING = {
       priceFactor: 1.15,
       featured: true,
     },
+    '0204': { label: '0204 — Centre special slotted (CSSC)', shortLabel: '0204', priceFactor: 1.12 },
+    '0205': { label: '0205 — Centre special overlap', shortLabel: '0205', priceFactor: 1.18 },
+    '0215': { label: '0215 — Full-lid, crash-lock bottom', shortLabel: '0215', priceFactor: 1.22 },
+    '0216': { label: '0216 — Interlocking bottom', shortLabel: '0216', priceFactor: 1.22 },
+    '0218': { label: '0218 — Tuck-top with lock tabs', shortLabel: '0218', priceFactor: 1.18 },
+    '0300': { label: '0300 — Telescope (two-piece)', shortLabel: '0300', priceFactor: 1.35 },
+    '0409': { label: '0409 — Wrap-around folder', shortLabel: '0409', priceFactor: 1.1 },
+    '0421': { label: '0421 — Tray with hinged tuck lid', shortLabel: '0421', priceFactor: 1.35 },
+    '0422': { label: '0422 — Self-locking tray', shortLabel: '0422', priceFactor: 1.25 },
     '0426': {
-      label: '0426 — Self-locking mailer',
+      label: '0426 — Hinged-lid mailer',
       shortLabel: '0426',
-      cardTitle: 'Self-lock mailer',
-      description: 'Die-cut mailer with self-locking walls. No tape needed.',
+      cardTitle: 'Hinged-lid mailer',
+      description: 'Die-cut mailer with lid, dust flaps and a front tuck.',
       priceFactor: 1.4,
       featured: true,
     },
     '0427': {
-      label: '0427 — Tray with hinged lid',
+      label: '0427 — Locking-wall mailer',
       shortLabel: '0427',
-      cardTitle: 'Hinged-lid tray',
-      description: 'Die-cut tray with hinged lid. Tabs lock into front-wall slots.',
+      cardTitle: 'Locking-wall mailer',
+      description: 'Double-wall sides lock into the base. Lid tabs into the front wall.',
       priceFactor: 1.45,
       featured: true,
     },
+    '0501': { label: '0501 — Sleeve (L × W)', shortLabel: '0501', priceFactor: 0.72 },
+    '0502': { label: '0502 — Sleeve (L × H)', shortLabel: '0502', priceFactor: 0.72 },
+    '0503': { label: '0503 — Sleeve (W × H)', shortLabel: '0503', priceFactor: 0.7 },
+    '0711': { label: '0711 — Ready-glued crash-lock', shortLabel: '0711', priceFactor: 1.28 },
   },
 
   defaultFefco: '0201',

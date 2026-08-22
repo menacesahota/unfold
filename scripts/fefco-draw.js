@@ -1,12 +1,10 @@
 /**
- * FEFCO flat blank (net) drawings for PDF mockups.
- * Geometries follow FEFCO Code of Designs conventions:
- * - 0201: all flaps equal length (= W/2), outer flaps meet; slots between flaps
- * - 0200: same as 0201 but top flaps omitted (HSC)
- * - 0203: all flaps equal length (= W), full outer overlap
- * - 0215: top as 0201; crash-lock / snap-lock bottom
- * - 0427: tray base + four walls + hinged lid from back + tab/slot lock
- * - 0409: five-panel wrap with end flaps
+ * FEFCO-style technical drawings for the spec engine.
+ *
+ * Geometry from the published code (12th ed.): L × W × H internal,
+ * manufacturer’s joint on the left, flap formulae per style.
+ * Drawing language from the same code’s symbol list: solid = cut,
+ * dashed = crease. Original line work — not a facsimile of FEFCO artwork.
  */
 
 export function shadeHex(hex, amount) {
@@ -24,515 +22,615 @@ export function shadeHex(hex, amount) {
   return `rgb(${r},${g},${b})`;
 }
 
-function fillStroke(ctx, fill, stroke, lw = 1.2) {
-  ctx.fillStyle = fill;
-  ctx.strokeStyle = stroke;
-  ctx.lineWidth = lw;
+const CUT = '#161616';
+const CREASE = '#c1121f';
+const INK = '#2c2c2c';
+const MUTED = '#777';
+
+function glueWidth(L, W) {
+  return Math.max(W * 0.08, L * 0.03, 18);
 }
 
-function rect(ctx, x, y, w, h, fill, stroke) {
-  fillStroke(ctx, fill, stroke);
-  ctx.beginPath();
-  ctx.rect(x, y, w, h);
-  ctx.fill();
-  ctx.stroke();
-}
-
-function score(ctx, x1, y1, x2, y2, color) {
+function cutPath(ctx, pts, closed = true) {
+  if (pts.length < 2) return;
   ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1;
-  ctx.setLineDash([5, 3.5]);
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.stroke();
-  ctx.restore();
-}
-
-function cut(ctx, x1, y1, x2, y2, color) {
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1.15;
+  ctx.strokeStyle = CUT;
+  ctx.lineWidth = 1.35;
+  ctx.lineJoin = 'miter';
   ctx.setLineDash([]);
   ctx.beginPath();
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i += 1) ctx.lineTo(pts[i][0], pts[i][1]);
+  if (closed) ctx.closePath();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function crease(ctx, x1, y1, x2, y2) {
+  ctx.save();
+  ctx.strokeStyle = CREASE;
+  ctx.lineWidth = 1.05;
+  ctx.setLineDash([4.5, 3.2]);
+  ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
   ctx.stroke();
   ctx.restore();
 }
 
-function label(ctx, text, x, y, color) {
-  ctx.fillStyle = color;
-  ctx.font = '600 11px Inter, system-ui, sans-serif';
+function label(ctx, text, x, y, size = 11) {
+  ctx.fillStyle = INK;
+  ctx.font = `600 ${size}px Inter, system-ui, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText(text, x, y);
 }
 
-function caption(ctx, text, pad) {
-  ctx.fillStyle = '#777';
+function caption(ctx, text, x, y) {
+  ctx.fillStyle = MUTED;
   ctx.font = '500 10px Inter, system-ui, sans-serif';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
-  ctx.fillText(text, pad, pad - 8);
+  ctx.fillText(text, x, y);
+}
+
+function legend(ctx, x, y) {
+  ctx.save();
+  ctx.strokeStyle = CUT;
+  ctx.lineWidth = 1.3;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + 18, y);
+  ctx.stroke();
+  ctx.fillStyle = MUTED;
+  ctx.font = '500 9px Inter, system-ui, sans-serif';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('cut', x + 22, y);
+  ctx.strokeStyle = CREASE;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(x + 48, y);
+  ctx.lineTo(x + 66, y);
+  ctx.stroke();
+  ctx.fillText('crease', x + 70, y);
+  ctx.restore();
+}
+
+function slot(ctx, x, y, w, h) {
+  ctx.save();
+  ctx.fillStyle = '#fff';
+  ctx.strokeStyle = CUT;
+  ctx.lineWidth = 1.1;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.rect(x, y, w, h);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+}
+
+function xsFrom(ox, widths) {
+  const xs = [ox];
+  widths.forEach((w, i) => xs.push(xs[i] + w));
+  return xs;
+}
+
+function fit(totalW, totalH, areaW, areaH, fill = 0.88) {
+  const scale = Math.min(areaW / Math.max(totalW, 1), areaH / Math.max(totalH, 1)) * fill;
+  return {
+    scale,
+    ox: (areaW - totalW * scale) / 2,
+    oy: (areaH - totalH * scale) / 2,
+  };
 }
 
 /**
  * @param {CanvasRenderingContext2D} ctx
- * @param {object} opts
  */
 export function drawFefcoBlank(ctx, {
   code,
   length: L,
   width: W,
   height: H,
-  boardColor = '#c9a87c',
+  overlap = 40,
   canvasW,
   canvasH,
 }) {
   ctx.clearRect(0, 0, canvasW, canvasH);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, canvasW, canvasH);
 
-  const fill = boardColor;
-  const stroke = shadeHex(boardColor, -0.48);
-  const scoreCol = shadeHex(boardColor, -0.58);
-  const ink = shadeHex(boardColor, -0.72);
-  const pad = 30;
-  const areaW = canvasW - pad * 2;
-  const areaH = canvasH - pad * 2;
+  const pad = 28;
+  const capH = 22;
+  const net = {
+    x: pad,
+    y: pad,
+    w: canvasW - pad * 2,
+    h: canvasH - pad - capH,
+  };
+  const o = Math.max(5, Number(overlap) || 40);
+  const g = { L, W, H, o, net };
 
-  if (code === '0427' || code === '0426') {
-    draw0427(ctx, {
-      L,
-      W,
-      H,
-      fill,
-      stroke,
-      scoreCol,
-      ink,
-      pad,
-      areaW,
-      areaH,
-      selfLock: code === '0426',
-    });
-    return;
-  }
-  if (code === '0409') {
-    draw0409(ctx, { L, W, H, fill, stroke, scoreCol, ink, pad, areaW, areaH });
-    return;
-  }
+  const map = {
+    '0200': () => slotted(ctx, g, {
+      top: [0, 0, 0, 0],
+      bot: [W / 2, W / 2, W / 2, W / 2],
+      cap: 'FEFCO 0200  ·  HSC  ·  bottom flaps = W/2  ·  not to scale',
+    }),
+    '0201': () => slotted(ctx, g, {
+      top: [W / 2, W / 2, W / 2, W / 2],
+      bot: [W / 2, W / 2, W / 2, W / 2],
+      cap: 'FEFCO 0201  ·  RSC  ·  all flaps = W/2  ·  not to scale',
+    }),
+    '0202': () => {
+      const f = (W + o) / 2;
+      slotted(ctx, g, {
+        top: [f, f, f, f],
+        bot: [f, f, f, f],
+        cap: `FEFCO 0202  ·  OSC  ·  flaps = (W+o)/2  ·  o=${Math.round(o)} mm  ·  not to scale`,
+      });
+    },
+    '0203': () => slotted(ctx, g, {
+      top: [W, W, W, W],
+      bot: [W, W, W, W],
+      cap: 'FEFCO 0203  ·  FOL  ·  all flaps = W  ·  not to scale',
+    }),
+    '0204': () => slotted(ctx, g, {
+      // Outer (L panels) = W/2; inner (W panels) = L/2 — both meet.
+      top: [W / 2, L / 2, W / 2, L / 2],
+      bot: [W / 2, L / 2, W / 2, L / 2],
+      cap: 'FEFCO 0204  ·  CSSC  ·  L flaps = W/2, W flaps = L/2  ·  not to scale',
+    }),
+    '0205': () => slotted(ctx, g, {
+      top: [L / 2, L / 2, L / 2, L / 2],
+      bot: [L / 2, L / 2, L / 2, L / 2],
+      cap: 'FEFCO 0205  ·  all flaps = L/2  ·  not to scale',
+    }),
+    '0215': () => slotted(ctx, g, {
+      top: [W, W * 0.4, 0, W * 0.4],
+      bot: [W / 2, W / 2, W / 2, W / 2],
+      botStyle: 'crash',
+      cap: 'FEFCO 0215  ·  full lid + crash-lock bottom  ·  not to scale',
+    }),
+    '0216': () => slotted(ctx, g, {
+      top: [W / 2, W / 2, W / 2, W / 2],
+      bot: [W / 2, W / 2, W / 2, W / 2],
+      botStyle: 'crash',
+      cap: 'FEFCO 0216  ·  interlocking bottom  ·  not to scale',
+    }),
+    '0218': () => slotted(ctx, g, {
+      top: [W, 0, 0, 0],
+      bot: [W / 2, W / 2, W / 2, W / 2],
+      topStyle: 'tuck',
+      cap: 'FEFCO 0218  ·  tuck-top with lock tabs  ·  not to scale',
+    }),
+    '0300': () => draw0300(ctx, g),
+    '0409': () => draw0409(ctx, g),
+    '0421': () => draw0421(ctx, g),
+    '0422': () => draw0422(ctx, g),
+    '0426': () => draw0426(ctx, g),
+    '0427': () => draw0427(ctx, g),
+    '0501': () => drawSleeve(ctx, g, [L, W, L, W], ['L', 'W', 'L', 'W'], H, 'FEFCO 0501  ·  sleeve L–W–L–W  ·  strip = H  ·  not to scale'),
+    '0502': () => drawSleeve(ctx, g, [L, H, L, H], ['L', 'H', 'L', 'H'], W, 'FEFCO 0502  ·  sleeve L–H–L–H  ·  strip = W  ·  not to scale'),
+    '0503': () => drawSleeve(ctx, g, [W, H, W, H], ['W', 'H', 'W', 'H'], L, 'FEFCO 0503  ·  sleeve W–H–W–H  ·  strip = L  ·  not to scale'),
+    '0711': () => slotted(ctx, g, {
+      top: [W / 2, W / 2, W / 2, W / 2],
+      bot: [W / 2, W / 2, W / 2, W / 2],
+      botStyle: 'crash',
+      cap: 'FEFCO 0711  ·  ready-glued crash-lock  ·  not to scale',
+    }),
+  };
 
-  drawSlotted(ctx, {
-    code,
-    L,
-    W,
-    H,
-    fill,
-    stroke,
-    scoreCol,
-    ink,
-    pad,
-    areaW,
-    areaH,
-  });
+  (map[code] || map['0201'])();
+  legend(ctx, pad, canvasH - 10);
 }
 
-/**
- * Slotted family blanks (02xx).
- * Body girth: L + W + L + W + manufacturer's joint.
- * Flap length is constant across all flaps for a given style
- * (FEFCO 0201: = W/2; FEFCO 0203: = W).
- */
-function drawSlotted(ctx, {
-  code, L, W, H, fill, stroke, scoreCol, ink, pad, areaW, areaH,
-}) {
-  const glue = Math.max(W * 0.1, L * 0.035, 12);
-  const body = [L, W, L, W, glue];
-  const bodySum = body.reduce((a, b) => a + b, 0);
+function flapText(d, L, W) {
+  if (Math.abs(d - W / 2) < 0.8) return '½ W';
+  if (Math.abs(d - W) < 0.8) return 'W';
+  if (Math.abs(d - L / 2) < 0.8) return '½ L';
+  if (Math.abs(d - L) < 0.8) return 'L';
+  return '';
+}
 
-  // FEFCO: all flaps same length for a given style
-  const flapLen = code === '0203' ? W : W / 2;
-  const hasTop = code !== '0200';
-  const crashLock = code === '0215';
-  const slotGap = Math.max(flapLen * 0.04, 2); // visual slot between flaps
+function crashPts(i, x0, x1, y, h) {
+  const pw = x1 - x0;
+  const mid = (x0 + x1) / 2;
+  if (i === 0 || i === 2) {
+    const tw = pw * 0.22;
+    return [
+      [x1, y],
+      [x1, y + h * 0.7],
+      [mid + tw, y + h * 0.7],
+      [mid + tw * 0.6, y + h],
+      [mid - tw * 0.6, y + h],
+      [mid - tw, y + h * 0.7],
+      [x0, y + h * 0.7],
+      [x0, y],
+    ];
+  }
+  if (i === 1) {
+    return [
+      [x1, y],
+      [x1, y + h * 0.28],
+      [x0 + pw * 0.18, y + h],
+      [x0, y + h * 0.52],
+      [x0, y],
+    ];
+  }
+  return [
+    [x1, y],
+    [x1, y + h * 0.52],
+    [x1 - pw * 0.18, y + h],
+    [x0, y + h * 0.28],
+    [x0, y],
+  ];
+}
 
-  const totalH = (hasTop ? flapLen : 0) + H + flapLen;
-  const scale = Math.min(areaW / bodySum, areaH / totalH) * 0.9;
+function slotted(ctx, g, { top, bot, botStyle = 'rect', topStyle = 'flaps', cap }) {
+  const { L, W, H, net } = g;
+  const glue = glueWidth(L, W);
+  const seq = [glue, L, W, L, W];
+  const topMax = Math.max(0, ...top);
+  const botMax = Math.max(0, ...bot);
+  const { scale, ox, oy } = fit(
+    seq.reduce((a, b) => a + b, 0),
+    topMax + H + botMax,
+    net.w,
+    net.h
+  );
   const s = (v) => v * scale;
+  const widths = seq.map(s);
+  const xs = xsFrom(net.x + ox, widths);
+  const bodyTop = net.y + oy + s(topMax);
+  const bodyBot = bodyTop + s(H);
+  const topPx = top.map(s);
+  const botPx = bot.map(s);
 
-  const drawW = bodySum * scale;
-  const ox = pad + (areaW - drawW) / 2;
-  const oy = pad + (areaH - totalH * scale) / 2;
+  const outline = [];
+  outline.push([xs[0], bodyBot]);
+  outline.push([xs[0], bodyTop]);
+  outline.push([xs[1], bodyTop]);
 
-  const xs = [ox];
-  body.forEach((p, i) => xs.push(xs[i] + s(p)));
-
-  const topH = hasTop ? s(flapLen) : 0;
-  const bodyH = s(H);
-  const botH = s(flapLen);
-  const gap = s(slotGap);
-
-  // --- Top flaps (0201 / 0203 / 0215) ---
-  if (hasTop) {
-    for (let i = 0; i < 4; i += 1) {
-      const x0 = xs[i] + gap / 2;
-      const x1 = xs[i + 1] - gap / 2;
-      const pw = x1 - x0;
-      if (pw <= 0) continue;
-      rect(ctx, x0, oy, pw, topH, fill, stroke);
-      // Slot cut between flaps (down to score)
-      if (i < 3) {
-        cut(ctx, xs[i + 1], oy, xs[i + 1], oy + topH, stroke);
-      }
-    }
-    score(ctx, ox, oy + topH, xs[4], oy + topH, scoreCol);
-  }
-
-  // --- Body panels ---
-  for (let i = 0; i < 5; i += 1) {
-    const pw = xs[i + 1] - xs[i];
-    rect(ctx, xs[i], oy + topH, pw, bodyH, fill, stroke);
-    if (i < 4) {
-      score(ctx, xs[i + 1], oy + topH, xs[i + 1], oy + topH + bodyH, scoreCol);
-    }
-  }
-
-  // Glue / manufacturer's joint hatching
-  {
-    const gx = xs[4];
-    const gw = xs[5] - xs[4];
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(gx, oy + topH, gw, bodyH);
-    ctx.clip();
-    ctx.strokeStyle = shadeHex(fill, -0.35);
-    ctx.lineWidth = 0.7;
-    for (let k = -bodyH; k < gw + bodyH; k += 5) {
-      ctx.beginPath();
-      ctx.moveTo(gx + k, oy + topH);
-      ctx.lineTo(gx + k + bodyH, oy + topH + bodyH);
-      ctx.stroke();
-    }
-    ctx.restore();
-    label(ctx, 'MJ', (xs[4] + xs[5]) / 2, oy + topH + bodyH / 2, ink);
-  }
-
-  // --- Bottom flaps ---
-  const by = oy + topH + bodyH;
-  score(ctx, ox, by, xs[4], by, scoreCol);
-
-  if (crashLock) {
-    drawCrashLockBottom(ctx, {
-      xs, by, botH, gap, fill, stroke, scoreCol,
-    });
+  if (topStyle === 'tuck') {
+    const x0 = xs[1];
+    const x1 = xs[2];
+    const h = topPx[0];
+    const ear = Math.min((x1 - x0) * 0.1, s(16));
+    const tuck = h * 0.2;
+    outline.push([x0 - ear, bodyTop - h * 0.55]);
+    outline.push([x0 + (x1 - x0) * 0.12, bodyTop - h + tuck]);
+    outline.push([x0 + (x1 - x0) * 0.16, bodyTop - h]);
+    outline.push([x1 - (x1 - x0) * 0.16, bodyTop - h]);
+    outline.push([x1 - (x1 - x0) * 0.12, bodyTop - h + tuck]);
+    outline.push([x1 + ear, bodyTop - h * 0.55]);
+    outline.push([x1, bodyTop]);
+    outline.push([xs[5], bodyTop]);
   } else {
     for (let i = 0; i < 4; i += 1) {
-      const x0 = xs[i] + gap / 2;
-      const x1 = xs[i + 1] - gap / 2;
-      const pw = x1 - x0;
-      if (pw <= 0) continue;
-      rect(ctx, x0, by, pw, botH, fill, stroke);
-      if (i < 3) {
-        cut(ctx, xs[i + 1], by, xs[i + 1], by + botH, stroke);
-      }
-      // FOL: dashed inner hint on major (outer) flaps
-      if (code === '0203' && (i === 0 || i === 2)) {
-        ctx.save();
-        ctx.strokeStyle = shadeHex(fill, -0.35);
-        ctx.lineWidth = 0.8;
-        ctx.setLineDash([3, 3]);
-        ctx.strokeRect(x0 + 4, by + 4, pw - 8, botH - 8);
-        ctx.restore();
+      const x0 = xs[i + 1];
+      const x1 = xs[i + 2];
+      const h = topPx[i];
+      if (h > 0.6) {
+        outline.push([x0, bodyTop - h]);
+        outline.push([x1, bodyTop - h]);
+        outline.push([x1, bodyTop]);
+      } else {
+        outline.push([x1, bodyTop]);
       }
     }
   }
 
-  // Panel labels
-  const midY = oy + topH + bodyH / 2;
-  label(ctx, 'L', (xs[0] + xs[1]) / 2, midY, ink);
-  label(ctx, 'W', (xs[1] + xs[2]) / 2, midY, ink);
-  label(ctx, 'L', (xs[2] + xs[3]) / 2, midY, ink);
-  label(ctx, 'W', (xs[3] + xs[4]) / 2, midY, ink);
+  outline.push([xs[5], bodyBot]);
 
-  // Dimension callouts on flaps
-  if (hasTop) {
-    label(ctx, code === '0203' ? 'W' : 'W/2', (xs[0] + xs[1]) / 2, oy + topH / 2, ink);
-  }
-  label(ctx, crashLock ? 'lock' : (code === '0203' ? 'W' : 'W/2'), (xs[0] + xs[1]) / 2, by + botH / 2, ink);
-
-  const captions = {
-    '0200': 'FEFCO 0200  ·  half slotted (HSC)  ·  bottom flaps only  ·  not to scale',
-    '0201': 'FEFCO 0201  ·  regular slotted (RSC)  ·  all flaps = W/2  ·  not to scale',
-    '0203': 'FEFCO 0203  ·  full overlap (FOL)  ·  all flaps = W  ·  not to scale',
-    '0215': 'FEFCO 0215  ·  crash-lock / snap-lock bottom  ·  not to scale',
-  };
-  caption(ctx, captions[code] || 'FEFCO blank  ·  not to scale', pad);
-}
-
-/** Classic corrugated crash-lock (auto-bottom) flap geometry */
-function drawCrashLockBottom(ctx, { xs, by, botH, gap, fill, stroke }) {
-  // Minor flaps (W panels, i=1,3): diagonal / trapezoid
-  for (const i of [1, 3]) {
-    const x0 = xs[i] + gap / 2;
-    const x1 = xs[i + 1] - gap / 2;
-    const pw = x1 - x0;
-    fillStroke(ctx, fill, stroke);
-    ctx.beginPath();
-    if (i === 1) {
-      ctx.moveTo(x0, by);
-      ctx.lineTo(x1, by);
-      ctx.lineTo(x1, by + botH * 0.28);
-      ctx.lineTo(x0 + pw * 0.2, by + botH);
-      ctx.lineTo(x0, by + botH * 0.55);
+  for (let i = 3; i >= 0; i -= 1) {
+    const x0 = xs[i + 1];
+    const x1 = xs[i + 2];
+    if (botStyle === 'crash') {
+      outline.push(...crashPts(i, x0, x1, bodyBot, botPx[i] || s(W / 2)));
     } else {
-      ctx.moveTo(x0, by);
-      ctx.lineTo(x1, by);
-      ctx.lineTo(x1, by + botH * 0.55);
-      ctx.lineTo(x1 - pw * 0.2, by + botH);
-      ctx.lineTo(x0, by + botH * 0.28);
+      const h = botPx[i];
+      if (h > 0.6) {
+        outline.push([x1, bodyBot + h]);
+        outline.push([x0, bodyBot + h]);
+        outline.push([x0, bodyBot]);
+      } else {
+        outline.push([x0, bodyBot]);
+      }
     }
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
   }
 
-  // Major flaps (L panels, i=0,2): interlocking with centre notch / tab
-  for (const i of [0, 2]) {
-    const x0 = xs[i] + gap / 2;
-    const x1 = xs[i + 1] - gap / 2;
-    const pw = x1 - x0;
-    fillStroke(ctx, fill, stroke);
-    ctx.beginPath();
-    // Stepped interlocking profile
-    ctx.moveTo(x0, by);
-    ctx.lineTo(x1, by);
-    ctx.lineTo(x1, by + botH * 0.7);
-    // locking tab
-    const tabL = pw * 0.28;
-    const tabX = (x0 + x1) / 2 - tabL / 2;
-    ctx.lineTo(tabX + tabL, by + botH * 0.7);
-    ctx.lineTo(tabX + tabL * 0.75, by + botH);
-    ctx.lineTo(tabX + tabL * 0.25, by + botH);
-    ctx.lineTo(tabX, by + botH * 0.7);
-    ctx.lineTo(x0, by + botH * 0.7);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+  cutPath(ctx, outline, true);
+
+  crease(ctx, xs[1], bodyTop, xs[1], bodyBot);
+  crease(ctx, xs[2], bodyTop, xs[2], bodyBot);
+  crease(ctx, xs[3], bodyTop, xs[3], bodyBot);
+  crease(ctx, xs[4], bodyTop, xs[4], bodyBot);
+  if (topMax > 0) crease(ctx, xs[1], bodyTop, xs[5], bodyTop);
+  crease(ctx, xs[1], bodyBot, xs[5], bodyBot);
+
+  if (topStyle === 'tuck') {
+    const slotW = Math.min(s(20), widths[2] * 0.32);
+    slot(ctx, (xs[2] + xs[3]) / 2 - slotW / 2, bodyTop - 1.6, slotW, 3.2);
+    slot(ctx, (xs[4] + xs[5]) / 2 - slotW / 2, bodyTop - 1.6, slotW, 3.2);
   }
 
-  // Slot cuts between panels
-  for (let i = 0; i < 3; i += 1) {
-    cut(ctx, xs[i + 1], by, xs[i + 1], by + botH * 0.35, stroke);
+  const midY = (bodyTop + bodyBot) / 2;
+  label(ctx, 'L', (xs[1] + xs[2]) / 2, midY);
+  label(ctx, 'W', (xs[2] + xs[3]) / 2, midY);
+  label(ctx, 'L', (xs[3] + xs[4]) / 2, midY);
+  label(ctx, 'W', (xs[4] + xs[5]) / 2, midY);
+  label(ctx, 'H', xs[0] + widths[0] / 2, midY, 9);
+
+  const tLabel = flapText(top[0] || top[1], L, W);
+  if (tLabel && topMax > 0 && topStyle === 'flaps') {
+    const i = top[0] >= (top[1] || 0) ? 0 : 1;
+    if (top[i]) label(ctx, tLabel, (xs[i + 1] + xs[i + 2]) / 2, bodyTop - topPx[i] / 2, 10);
   }
+  const bLabel = botStyle === 'crash' ? '' : flapText(bot[0], L, W);
+  if (bLabel) label(ctx, bLabel, (xs[1] + xs[2]) / 2, bodyBot + botPx[0] / 2, 10);
+  caption(ctx, cap, net.x + 118, net.y + net.h + 16);
 }
 
-/**
- * FEFCO 0427 — tray with hinged lid (official structure):
- * bottom + 4 walls; lid continues from back wall; two tuck tabs
- * engage slots in the front wall.
- *
- * Flat layout (centre column top→bottom):
- *   tuck tabs → lid (L×W) → back (L×H) → bottom (L×W) → front (L×H)
- * Side walls (H×W) sit left/right of the bottom panel.
- */
-function draw0427(ctx, {
-  L, W, H, fill, stroke, scoreCol, ink, pad, areaW, areaH, selfLock = false,
-}) {
-  const tuck = Math.max(H * 0.28, W * 0.12, 18);
-  const tabW = Math.min(L * 0.18, L / 2 - 8);
-  const tabH = Math.max(tuck * 0.55, 10);
-  const dust = Math.min(H * 0.4, W * 0.35);
-
-  // Side walls are H wide (fold up) × W tall (match bottom depth)
-  const totalW = dust + H + L + H + dust;
-  const totalH = tabH + W + H + W + H;
-  const scale = Math.min(areaW / totalW, areaH / totalH) * 0.88;
+function draw0300(ctx, g) {
+  const { L, W, H, net } = g;
+  const grow = Math.max(8, Math.min(L, W) * 0.04);
+  const pieces = [
+    { l: L, w: W, h: H, title: 'BODY' },
+    { l: L + grow, w: W + grow, h: H, title: 'LID  L+ W+ H' },
+  ];
+  const pieceW = (p) => p.l + 2 * p.h + 2 * p.h;
+  const pieceH = (p) => p.w + 2 * p.h;
+  const gap = Math.max(L, W) * 0.12;
+  const totalW = pieceW(pieces[0]) + gap + pieceW(pieces[1]);
+  const totalH = Math.max(pieceH(pieces[0]), pieceH(pieces[1]));
+  const { scale, ox, oy } = fit(totalW, totalH, net.w, net.h, 0.86);
   const s = (v) => v * scale;
 
-  const drawW = totalW * scale;
-  const drawH = totalH * scale;
-  const ox = pad + (areaW - drawW) / 2;
-  const oy = pad + (areaH - drawH) / 2;
+  const drawTray = (x, y, p) => {
+    const tab = s(p.h);
+    const bx = x + tab + s(p.h);
+    const by = y + s(p.h);
+    const outline = [
+      [bx, by],
+      [bx, by - s(p.h)],
+      [bx + s(p.l), by - s(p.h)],
+      [bx + s(p.l), by],
+      [bx + s(p.l) + s(p.h), by],
+      [bx + s(p.l) + s(p.h) + tab, by],
+      [bx + s(p.l) + s(p.h) + tab, by + s(p.w)],
+      [bx + s(p.l) + s(p.h), by + s(p.w)],
+      [bx + s(p.l), by + s(p.w)],
+      [bx + s(p.l), by + s(p.w) + s(p.h)],
+      [bx, by + s(p.w) + s(p.h)],
+      [bx, by + s(p.w)],
+      [bx - s(p.h), by + s(p.w)],
+      [bx - s(p.h) - tab, by + s(p.w)],
+      [bx - s(p.h) - tab, by],
+      [bx - s(p.h), by],
+    ];
+    cutPath(ctx, outline, true);
+    crease(ctx, bx, by, bx + s(p.l), by);
+    crease(ctx, bx, by + s(p.w), bx + s(p.l), by + s(p.w));
+    crease(ctx, bx, by, bx, by + s(p.w));
+    crease(ctx, bx + s(p.l), by, bx + s(p.l), by + s(p.w));
+    crease(ctx, bx - s(p.h), by, bx - s(p.h), by + s(p.w));
+    crease(ctx, bx + s(p.l) + s(p.h), by, bx + s(p.l) + s(p.h), by + s(p.w));
+    label(ctx, p.title, bx + s(p.l) / 2, by + s(p.w) / 2, 10);
+    label(ctx, 'L', bx + s(p.l) / 2, by - s(p.h) / 2, 10);
+    label(ctx, 'W', bx - s(p.h) / 2, by + s(p.w) / 2, 10);
+  };
 
-  const xDustL = ox;
-  const xSideL = ox + s(dust);
-  const xBase = ox + s(dust + H);
-  const xSideR = ox + s(dust + H + L);
-  const xEnd = ox + s(dust + H + L + H);
+  const x0 = net.x + ox;
+  const y0 = net.y + oy;
+  drawTray(x0, y0, pieces[0]);
+  drawTray(x0 + s(pieceW(pieces[0]) + gap), y0, pieces[1]);
 
-  const yTab = oy;
-  const yLid = oy + s(tabH);
+  caption(ctx, 'FEFCO 0300  ·  telescopic two-piece  ·  lid = L+ × W+ × H  ·  not to scale', net.x + 118, net.y + net.h + 16);
+}
+
+function draw0409(ctx, g) {
+  const { L, W, H, net } = g;
+  const panels = [W, H, W, H];
+  const names = ['W', 'H', 'W', 'H'];
+  const flap = Math.min(W * 0.5, H * 0.75);
+  const { scale, ox, oy } = fit(panels.reduce((a, b) => a + b, 0), flap + L + flap, net.w, net.h);
+  const s = (v) => v * scale;
+  const xs = xsFrom(net.x + ox, panels.map(s));
+  const y1 = net.y + oy + s(flap);
+  const y2 = y1 + s(L);
+  const inset = (pw) => Math.min(pw * 0.1, s(8));
+  const outline = [];
+  outline.push([xs[0], y1]);
+  for (let i = 0; i < 4; i += 1) {
+    const pw = xs[i + 1] - xs[i];
+    const inn = inset(pw);
+    outline.push([xs[i] + inn, y1 - s(flap)]);
+    outline.push([xs[i + 1] - inn, y1 - s(flap)]);
+    outline.push([xs[i + 1], y1]);
+  }
+  outline.push([xs[4], y2]);
+  for (let i = 3; i >= 0; i -= 1) {
+    const pw = xs[i + 1] - xs[i];
+    const inn = inset(pw);
+    outline.push([xs[i + 1] - inn, y2 + s(flap)]);
+    outline.push([xs[i] + inn, y2 + s(flap)]);
+    outline.push([xs[i], y2]);
+  }
+  cutPath(ctx, outline, true);
+  for (let i = 1; i < 4; i += 1) crease(ctx, xs[i], y1, xs[i], y2);
+  crease(ctx, xs[0], y1, xs[4], y1);
+  crease(ctx, xs[0], y2, xs[4], y2);
+  names.forEach((n, i) => label(ctx, n, (xs[i] + xs[i + 1]) / 2, y1 + s(L) / 2));
+  caption(ctx, 'FEFCO 0409  ·  wrap-around  ·  W–H–W–H  ·  strip = L  ·  not to scale', net.x + 118, net.y + net.h + 16);
+}
+
+function mailerNet(ctx, g, { doubleWall, dust, cap }) {
+  const { L, W, H, net } = g;
+  const tuck = Math.max(H * 0.28, 14);
+  const side = doubleWall ? H * 2 : H;
+  const dustW = dust ? Math.min(H * 0.8, W * 0.42) : 0;
+  const totalW = Math.max(side * 2 + L, dustW * 2 + L);
+  const totalH = tuck + W + H + W + H;
+  const { scale, ox, oy } = fit(totalW, totalH, net.w, net.h, 0.86);
+  const s = (v) => v * scale;
+  const xB = net.x + ox + (s(totalW) - s(L)) / 2;
+  const xR = xB + s(L);
+  const xL = xB - s(side);
+  const xEnd = xR + s(side);
+  const yTuck = net.y + oy;
+  const yLid = yTuck + s(tuck);
   const yBack = yLid + s(W);
   const yBase = yBack + s(H);
   const yFront = yBase + s(W);
+  const yEnd = yFront + s(H);
+  const d = s(dustW);
 
-  // Lid
-  rect(ctx, xBase, yLid, s(L), s(W), fill, stroke);
-
-  // Two tuck tabs on outer lid edge
-  const tabGap = s(L) * 0.14;
-  const tw = s(tabW);
-  const t1x = xBase + tabGap;
-  const t2x = xBase + s(L) - tabGap - tw;
-  for (const tx of [t1x, t2x]) {
-    fillStroke(ctx, fill, stroke);
-    ctx.beginPath();
-    ctx.moveTo(tx, yLid);
-    ctx.lineTo(tx + tw, yLid);
-    ctx.lineTo(tx + tw * 0.85, yTab);
-    ctx.lineTo(tx + tw * 0.15, yTab);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
+  const outline = [
+    [xB + s(L) * 0.2, yTuck],
+    [xR - s(L) * 0.2, yTuck],
+    [xR - s(L) * 0.08, yLid],
+  ];
+  if (dust) {
+    outline.push([xR + d, yLid + s(W) * 0.12]);
+    outline.push([xR + d, yLid + s(W) * 0.88]);
+    outline.push([xR, yBack]);
+  } else if (doubleWall) {
+    outline.push([xR + s(H), yLid + s(W) * 0.2]);
+    outline.push([xR + s(H), yBack]);
   }
-
-  // Back wall (L × H)
-  rect(ctx, xBase, yBack, s(L), s(H), fill, stroke);
-
-  // Bottom (L × W)
-  rect(ctx, xBase, yBase, s(L), s(W), fill, stroke);
-
-  // Front wall (L × H) + lock slots
-  rect(ctx, xBase, yFront, s(L), s(H), fill, stroke);
-  ctx.save();
-  ctx.strokeStyle = stroke;
-  ctx.fillStyle = '#fff';
-  ctx.lineWidth = 1.2;
-  const slotY = yFront + s(H) * 0.38;
-  for (const tx of [t1x, t2x]) {
-    ctx.fillRect(tx + tw * 0.1, slotY, tw * 0.8, 3.5);
-    ctx.strokeRect(tx + tw * 0.1, slotY, tw * 0.8, 3.5);
+  outline.push([xR, yBase]);
+  outline.push([xEnd, yBase + s(W) * 0.06]);
+  outline.push([xEnd, yBase + s(W) * 0.94]);
+  outline.push([xR, yFront]);
+  outline.push([xR, yEnd]);
+  outline.push([xB, yEnd]);
+  outline.push([xB, yFront]);
+  outline.push([xL, yBase + s(W) * 0.94]);
+  outline.push([xL, yBase + s(W) * 0.06]);
+  outline.push([xB, yBase]);
+  outline.push([xB, yBack]);
+  if (dust) {
+    outline.push([xB - d, yLid + s(W) * 0.88]);
+    outline.push([xB - d, yLid + s(W) * 0.12]);
+    outline.push([xB + s(L) * 0.08, yLid]);
+  } else if (doubleWall) {
+    outline.push([xB - s(H), yBack]);
+    outline.push([xB - s(H), yLid + s(W) * 0.2]);
+    outline.push([xB + s(L) * 0.08, yLid]);
+  } else {
+    outline.push([xB + s(L) * 0.08, yLid]);
   }
-  ctx.restore();
+  cutPath(ctx, outline, true);
 
-  // Side walls left/right of bottom (H wide × W tall)
-  rect(ctx, xSideL, yBase, s(H), s(W), fill, stroke);
-  rect(ctx, xSideR, yBase, s(H), s(W), fill, stroke);
-
-  // Dust flaps on outer edges of side walls
-  fillStroke(ctx, fill, stroke);
-  ctx.beginPath();
-  ctx.moveTo(xSideL, yBase + s(W) * 0.1);
-  ctx.lineTo(xSideL, yBase + s(W) * 0.9);
-  ctx.lineTo(xDustL + 1, yBase + s(W) * 0.72);
-  ctx.lineTo(xDustL + 1, yBase + s(W) * 0.28);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-
-  ctx.beginPath();
-  ctx.moveTo(xSideR + s(H), yBase + s(W) * 0.1);
-  ctx.lineTo(xSideR + s(H), yBase + s(W) * 0.9);
-  ctx.lineTo(xEnd + s(dust) - 1, yBase + s(W) * 0.72);
-  ctx.lineTo(xEnd + s(dust) - 1, yBase + s(W) * 0.28);
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-
-  // Lid side wings (fold inside) — partial height of lid
-  const wingH = Math.min(s(H) * 0.65, s(W) * 0.45);
-  rect(ctx, xSideL, yLid + s(W) - wingH, s(H), wingH, fill, stroke);
-  rect(ctx, xSideR, yLid + s(W) - wingH, s(H), wingH, fill, stroke);
-
-  // Scores
-  score(ctx, xBase, yLid, xBase + s(L), yLid, scoreCol);
-  score(ctx, xBase, yBack, xBase + s(L), yBack, scoreCol);
-  score(ctx, xBase, yBase, xBase + s(L), yBase, scoreCol);
-  score(ctx, xBase, yFront, xBase + s(L), yFront, scoreCol);
-  score(ctx, xSideL, yBase, xSideL, yBase + s(W), scoreCol);
-  score(ctx, xBase, yBase, xBase, yBase + s(W), scoreCol);
-  score(ctx, xSideR, yBase, xSideR, yBase + s(W), scoreCol);
-  score(ctx, xSideR + s(H), yBase, xSideR + s(H), yBase + s(W), scoreCol);
-
-  label(ctx, 'LID', xBase + s(L) / 2, yLid + s(W) / 2, ink);
-  label(ctx, 'BACK', xBase + s(L) / 2, yBack + s(H) / 2, ink);
-  label(ctx, 'BOTTOM', xBase + s(L) / 2, yBase + s(W) / 2, ink);
-  label(ctx, 'FRONT', xBase + s(L) / 2, yFront + s(H) / 2, ink);
-  label(ctx, 'SIDE', xSideL + s(H) / 2, yBase + s(W) / 2, ink);
-  label(ctx, 'SIDE', xSideR + s(H) / 2, yBase + s(W) / 2, ink);
-
-  caption(
-    ctx,
-    selfLock
-      ? 'FEFCO 0426  ·  self-locking mailer  ·  not to scale'
-      : 'FEFCO 0427  ·  tray with hinged lid  ·  tab & slot lock  ·  not to scale',
-    pad
-  );
+  crease(ctx, xB, yLid, xR, yLid);
+  crease(ctx, xB, yBack, xR, yBack);
+  crease(ctx, xB, yBase, xR, yBase);
+  crease(ctx, xB, yFront, xR, yFront);
+  crease(ctx, xB, yBase, xB, yFront);
+  crease(ctx, xR, yBase, xR, yFront);
+  if (doubleWall) {
+    crease(ctx, xB - s(H), yBase, xB - s(H), yFront);
+    crease(ctx, xR + s(H), yBase, xR + s(H), yFront);
+    const sw = Math.min(s(22), s(L) * 0.12);
+    slot(ctx, xB + s(L) * 0.18, yFront + s(H) * 0.38, sw, 3.2);
+    slot(ctx, xR - s(L) * 0.18 - sw, yFront + s(H) * 0.38, sw, 3.2);
+    slot(ctx, xB + 5, yBase + s(W) * 0.22, 3.2, s(14));
+    slot(ctx, xR - 8.2, yBase + s(W) * 0.22, 3.2, s(14));
+  } else {
+    slot(ctx, xB + s(L) * 0.22, yBack - 1.5, Math.min(s(18), s(L) * 0.1), 3);
+    slot(ctx, xR - s(L) * 0.22 - Math.min(s(18), s(L) * 0.1), yBack - 1.5, Math.min(s(18), s(L) * 0.1), 3);
+  }
+  label(ctx, 'LID', xB + s(L) / 2, yLid + s(W) / 2, 10);
+  label(ctx, 'BASE', xB + s(L) / 2, yBase + s(W) / 2, 10);
+  label(ctx, 'L', xB + s(L) / 2, yBase + s(W) / 2 + 14, 9);
+  label(ctx, 'H', xB + s(L) / 2, yBack + s(H) / 2, 9);
+  caption(ctx, cap, net.x + 118, net.y + net.h + 16);
 }
 
-/**
- * FEFCO 0409 — five-panel wrap.
- * Five panels in a row wrap the girth; end flaps close both ends.
- * Panel sequence (common): H | W | H | W | H  (closing overlap on last H).
- * Vertical dimension of the strip = product length L.
- */
-function draw0409(ctx, { L, W, H, fill, stroke, scoreCol, ink, pad, areaW, areaH }) {
-  const panels = [H, W, H, W, H];
-  const endFlap = Math.min(W * 0.5, H * 0.85); // end closure depth
-  const sum = panels.reduce((a, b) => a + b, 0);
-  const totalW = sum;
-  const totalH = endFlap + L + endFlap;
-  const scale = Math.min(areaW / totalW, areaH / totalH) * 0.9;
+function draw0421(ctx, g) {
+  mailerNet(ctx, g, {
+    doubleWall: false,
+    dust: false,
+    cap: 'FEFCO 0421  ·  tray + hinged tuck lid  ·  not to scale',
+  });
+}
+
+function draw0422(ctx, g) {
+  const { L, W, H, net } = g;
+  const totalW = H + L + H;
+  const totalH = H + W + H;
+  const { scale, ox, oy } = fit(totalW, totalH, net.w, net.h, 0.88);
   const s = (v) => v * scale;
+  const xL = net.x + ox;
+  const xB = xL + s(H);
+  const xR = xB + s(L);
+  const xEnd = xR + s(H);
+  const yN = net.y + oy;
+  const yB = yN + s(H);
+  const yS = yB + s(W);
+  cutPath(ctx, [
+    [xB, yN],
+    [xR, yN],
+    [xR, yB],
+    [xEnd, yB],
+    [xEnd, yS],
+    [xR, yS],
+    [xR, yS + s(H)],
+    [xB, yS + s(H)],
+    [xB, yS],
+    [xL, yS],
+    [xL, yB],
+    [xB, yB],
+  ], true);
+  crease(ctx, xB, yB, xR, yB);
+  crease(ctx, xB, yS, xR, yS);
+  crease(ctx, xB, yB, xB, yS);
+  crease(ctx, xR, yB, xR, yS);
+  const sw = Math.min(s(16), s(L) * 0.1);
+  slot(ctx, xB + s(L) * 0.2, yB + 5, sw, 3.2);
+  slot(ctx, xB + s(L) * 0.65, yB + 5, sw, 3.2);
+  slot(ctx, xB + s(L) * 0.2, yS - 8, sw, 3.2);
+  slot(ctx, xB + s(L) * 0.65, yS - 8, sw, 3.2);
+  label(ctx, 'BASE', xB + s(L) / 2, yB + s(W) / 2, 10);
+  caption(ctx, 'FEFCO 0422  ·  self-locking tray  ·  no lid  ·  not to scale', net.x + 118, net.y + net.h + 16);
+}
 
-  const drawW = totalW * scale;
-  const drawH = totalH * scale;
-  const ox = pad + (areaW - drawW) / 2;
-  const oy = pad + (areaH - drawH) / 2;
+function draw0426(ctx, g) {
+  mailerNet(ctx, g, {
+    doubleWall: false,
+    dust: true,
+    cap: 'FEFCO 0426  ·  hinged-lid mailer  ·  dust flaps + tuck  ·  not to scale',
+  });
+}
 
-  const xs = [ox];
-  panels.forEach((p, i) => xs.push(xs[i] + s(p)));
+function draw0427(ctx, g) {
+  mailerNet(ctx, g, {
+    doubleWall: true,
+    dust: false,
+    cap: 'FEFCO 0427  ·  locking-wall mailer  ·  double sides  ·  not to scale',
+  });
+}
 
-  const y0 = oy;
-  const y1 = oy + s(endFlap);
-  const y2 = y1 + s(L);
-
-  // End flaps only on the W panels (indices 1 and 3) — close the ends of the wrap
-  for (const i of [1, 3]) {
-    const pw = xs[i + 1] - xs[i];
-    // Top end flap (slightly tapered)
-    fillStroke(ctx, fill, stroke);
-    ctx.beginPath();
-    ctx.moveTo(xs[i] + 2, y1);
-    ctx.lineTo(xs[i + 1] - 2, y1);
-    ctx.lineTo(xs[i + 1] - pw * 0.12, y0);
-    ctx.lineTo(xs[i] + pw * 0.12, y0);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-    // Bottom end flap
-    ctx.beginPath();
-    ctx.moveTo(xs[i] + 2, y2);
-    ctx.lineTo(xs[i + 1] - 2, y2);
-    ctx.lineTo(xs[i + 1] - pw * 0.12, y2 + s(endFlap));
-    ctx.lineTo(xs[i] + pw * 0.12, y2 + s(endFlap));
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-  }
-
-  // Five body panels
-  const names = ['H', 'W', 'H', 'W', 'H'];
-  for (let i = 0; i < 5; i += 1) {
-    const pw = xs[i + 1] - xs[i];
-    rect(ctx, xs[i], y1, pw, s(L), fill, stroke);
-    if (i < 4) {
-      score(ctx, xs[i + 1], y1, xs[i + 1], y2, scoreCol);
-    }
-    // Closing panel (last H) — light hatch to show overlap/seal panel
-    if (i === 4) {
-      ctx.save();
-      ctx.strokeStyle = shadeHex(fill, -0.35);
-      ctx.lineWidth = 0.7;
-      ctx.setLineDash([3, 3]);
-      ctx.strokeRect(xs[i] + 4, y1 + 4, pw - 8, s(L) - 8);
-      ctx.restore();
-    }
-    label(ctx, names[i], (xs[i] + xs[i + 1]) / 2, y1 + s(L) / 2, ink);
-  }
-
-  score(ctx, ox, y1, ox + drawW, y1, scoreCol);
-  score(ctx, ox, y2, ox + drawW, y2, scoreCol);
-
-  caption(ctx, 'FEFCO 0409  ·  five-panel wrap  ·  end flaps on W panels  ·  not to scale', pad);
+function drawSleeve(ctx, g, panels, names, strip, cap) {
+  const { net } = g;
+  const glue = glueWidth(panels[0], panels[1]);
+  const seq = [glue, ...panels];
+  const { scale, ox, oy } = fit(seq.reduce((a, b) => a + b, 0), strip, net.w, net.h);
+  const s = (v) => v * scale;
+  const xs = xsFrom(net.x + ox, seq.map(s));
+  const y = net.y + oy;
+  const h = s(strip);
+  cutPath(ctx, [
+    [xs[0], y],
+    [xs[xs.length - 1], y],
+    [xs[xs.length - 1], y + h],
+    [xs[0], y + h],
+  ], true);
+  for (let i = 1; i < xs.length - 1; i += 1) crease(ctx, xs[i], y, xs[i], y + h);
+  label(ctx, 'MJ', (xs[0] + xs[1]) / 2, y + h / 2, 9);
+  names.forEach((n, i) => label(ctx, n, (xs[i + 1] + xs[i + 2]) / 2, y + h / 2));
+  caption(ctx, cap, net.x + 118, net.y + net.h + 16);
 }

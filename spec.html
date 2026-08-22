@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Free box spec engine: manufacturer-ready spec, style photo, artwork checklist and a landed-cost band. Download a PDF and get it made through unfold."
+    />
+    <title>unfold — box spec engine</title>
+    <link rel="canonical" href="https://unfold.supply/spec.html" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@8..144,400;8..144,500;8..144,600;8..144,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles/main.css" />
+    <link rel="stylesheet" href="/styles/tools.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="logo">unfold</a>
+        <nav class="nav" aria-label="Main">
+          <a href="/spec.html">Box spec</a>
+          <a href="/ppwr.html">PPWR pack</a>
+          <a href="/#brief">Free quote</a>
+          <a href="/portal.html">Portal</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="tools-hero">
+        <div class="container">
+          <p class="tools-kicker">Digital product</p>
+          <h1>Box spec engine</h1>
+          <p class="lead">
+            Internal size in millimetres: L × W × H. L is the longer side at
+            the opening. Manufacturer spec, style photo and a landed-cost band
+            out. Style codes follow the FEFCO Code, 12th edition (2022).
+          </p>
+        </div>
+      </section>
+
+      <div class="container tools-layout">
+        <form class="tools-form" id="spec-form">
+          <div>
+            <h2>Pack</h2>
+            <p class="style-hint" id="style-hint"></p>
+            <p class="style-meta" id="style-meta"></p>
+          </div>
+
+          <label class="field">
+            Style
+            <select name="style" id="spec-style"></select>
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              Length (mm)
+              <input type="number" name="length" min="20" max="1200" step="1" value="300" />
+            </label>
+            <label class="field">
+              Width (mm)
+              <input type="number" name="width" min="20" max="1200" step="1" value="220" />
+            </label>
+          </div>
+          <div class="field-row">
+            <label class="field">
+              Height (mm)
+              <input type="number" name="height" min="20" max="1200" step="1" value="150" />
+            </label>
+            <label class="field">
+              Quantity
+              <input type="number" name="quantity" min="1" step="1" value="500" />
+            </label>
+          </div>
+          <label class="field" id="overlap-field" hidden>
+            Overlap o (mm)
+            <input type="number" name="overlap" min="5" max="250" step="1" value="40" />
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              Board
+              <select name="board">
+                <option value="kraft">Kraft</option>
+                <option value="white">White</option>
+              </select>
+            </label>
+            <label class="field">
+              Wall
+              <select name="wall">
+                <option value="single">Single wall</option>
+                <option value="double">Double wall</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field-row">
+            <label class="field">
+              Print
+              <select name="ink">
+                <option value="none">Unprinted</option>
+                <option value="water-flexo" selected>Water-based flexo</option>
+                <option value="uv-flexo">UV flexo</option>
+              </select>
+            </label>
+            <label class="field">
+              Coating
+              <select name="coating">
+                <option value="none" selected>None</option>
+                <option value="water-varnish">Water-based varnish</option>
+                <option value="pe">PE / poly coating</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="field">
+            Ship-from / sell-into
+            <select name="region">
+              <option value="uk">United Kingdom</option>
+              <option value="eu">European Union</option>
+              <option value="us">United States</option>
+              <option value="row">Rest of world</option>
+            </select>
+          </label>
+
+          <label class="field">
+            Brand on the pack <span class="field-optional">optional</span>
+            <input type="text" name="brand" placeholder="Shown on the spec PDF" autocomplete="organization" />
+          </label>
+
+          <div class="tools-actions">
+            <button type="button" class="btn" id="download-spec">Download spec PDF</button>
+            <button type="button" class="btn btn-ghost" id="manufacture-spec">Get this made</button>
+          </div>
+          <p class="form-note" id="spec-status" role="status"></p>
+          <p class="tools-source">
+            Style numbers follow the
+            <a href="https://www.fefco.org/sites/default/files/files/FEFCO%20Code_WEB%287%29.pdf" rel="noopener" target="_blank">FEFCO Code, 12th edition (2022)</a>.
+            The picture is the erected pack, not a cutting die.
+          </p>
+        </form>
+
+        <div class="tools-panel">
+          <div class="style-stage">
+            <img id="style-preview" alt="Erected box style" />
+            <p class="style-stage-cap" id="style-preview-cap"></p>
+          </div>
+          <div class="band-card" id="price-band"></div>
+          <div class="checklist-card">
+            <h2>Artwork checklist</h2>
+            <ol id="artwork-checklist"></ol>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <span class="footer-brand">unfold</span>
+        <span class="footer-tag">Spec first. Quote when you want it made.</span>
+        <a href="mailto:hello@unfold.supply">hello@unfold.supply</a>
+        <span class="footer-copy">&copy; 2026</span>
+      </div>
+    </footer>
+
+    <script type="module" src="/scripts/spec-engine.js"></script>
+  </body>
+</html>

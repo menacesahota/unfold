@@ -12,6 +12,8 @@ export default defineConfig({
         portal: resolve(__dirname, 'portal.html'),
         portalOrder: resolve(__dirname, 'portal-order.html'),
         portalAdmin: resolve(__dirname, 'portal-admin.html'),
+        spec: resolve(__dirname, 'spec.html'),
+        ppwr: resolve(__dirname, 'ppwr.html'),
       },
     },
   },
