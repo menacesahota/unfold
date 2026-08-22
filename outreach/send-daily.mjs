@@ -1,12 +1,16 @@
 /**
- * Weekday outreach — 5 UK SME product brands/day via Resend.
+ * Weekday outreach — drafts 5 UK SME product brand emails/day for manual review.
  *
  * Prospects come from outreach/data/prospects-queue.json (UK product brands).
  * Contact emails are taken only from public pages on each brand's own site.
  *
+ * This script does NOT send email automatically. It writes each prepared
+ * message to outreach/data/outbox.jsonl (with a ready-to-click mailto: link)
+ * so a human can review and send it manually.
+ *
  * Usage:
  *   node outreach/send-daily.mjs --dry-run
- *   RESEND_API_KEY=re_xxx node outreach/send-daily.mjs
+ *   node outreach/send-daily.mjs
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -17,10 +21,9 @@ const DATA = path.join(__dirname, "data");
 const QUEUE_FILE = path.join(DATA, "prospects-queue.json");
 const SUPPRESS_FILE = path.join(DATA, "suppress.json");
 const SENT_FILE = path.join(DATA, "sent.jsonl");
+const OUTBOX_FILE = path.join(DATA, "outbox.jsonl");
 
 const DAILY_LIMIT = 5;
-const FROM = "unfold <hello@unfold.supply>";
-const REPLY_TO = "hello@unfold.supply";
 const SITE = "https://unfold.supply";
 
 const CONSUMER_DOMAINS = new Set([
@@ -78,6 +81,15 @@ function loadSent() {
 
 function appendSent(row) {
   fs.appendFileSync(SENT_FILE, `${JSON.stringify(row)}\n`, "utf8");
+}
+
+function appendOutbox(row) {
+  fs.appendFileSync(OUTBOX_FILE, `${JSON.stringify(row)}\n`, "utf8");
+}
+
+function buildMailto(to, subject, body) {
+  const params = new URLSearchParams({ subject, body });
+  return `mailto:${to}?${params.toString().replace(/\+/g, "%20")}`;
 }
 
 function sleep(ms) {
@@ -212,42 +224,16 @@ We source packaging suppliers, negotiate pricing, and quote you for free. If the
 
 Get a free quote: ${SITE}
 
-Reply to this email if useful, or tell us to stop and we won’t contact you again.
+Reply to this email if useful, or tell us to stop and we won't contact you again.
 
 Kind regards,
 unfold
 ${SITE}
 hello@unfold.supply
 
-To unsubscribe: reply with “unsubscribe” or email hello@unfold.supply with subject Unsubscribe.`;
+To unsubscribe: reply with "unsubscribe" or email hello@unfold.supply with subject Unsubscribe.`;
 
   return { subject, text };
-}
-
-async function sendResend({ to, subject, text }) {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) throw new Error("RESEND_API_KEY is not set");
-
-  const res = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: FROM,
-      to: [to],
-      reply_to: REPLY_TO,
-      subject,
-      text,
-    }),
-  });
-
-  const body = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(`Resend ${res.status}: ${JSON.stringify(body)}`);
-  }
-  return body;
 }
 
 async function main() {
@@ -271,7 +257,7 @@ async function main() {
     }
     const host = rootHost(entry.website);
     if (sent.domains.has(host)) {
-      console.log(`Skip already-sent domain: ${host}`);
+      console.log(`Skip already-drafted domain: ${host}`);
       continue;
     }
 
@@ -288,7 +274,7 @@ async function main() {
   }
 
   if (!ready.length) {
-    console.log("No sendable prospects today. Top up prospects-queue.json.");
+    console.log("No draftable prospects today. Top up prospects-queue.json.");
     process.exit(0);
   }
 
@@ -308,23 +294,16 @@ async function main() {
     };
 
     if (dryRun) {
-      console.log(`[dry-run] would send → ${p.email} (${p.company})`);
+      console.log(`[dry-run] would draft → ${p.email} (${p.company})`);
       putBack.push(p.queueEntry);
       continue;
     }
 
-    try {
-      const result = await sendResend({ to: p.email, subject, text });
-      row.id = result.id || null;
-      appendSent(row);
-      console.log(`Sent → ${p.email} (${p.company}) id=${row.id || "?"}`);
-      await sleep(1200);
-    } catch (err) {
-      console.error(`Failed → ${p.email}: ${err.message}`);
-      row.error = err.message;
-      appendSent(row);
-      putBack.push(p.queueEntry);
-    }
+    row.status = "drafted";
+    row.mailto = buildMailto(p.email, subject, text);
+    appendSent(row);
+    appendOutbox(row);
+    console.log(`Drafted → ${p.email} (${p.company})`);
   }
 
   if (!dryRun) {
