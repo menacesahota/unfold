@@ -68,7 +68,7 @@ function renderOrders(orders, profile) {
         label: order.status,
       };
       return `
-        <a class="order-card" href="/portal-order.html?id=${encodeURIComponent(order.id)}">
+        <a class="order-card" href="/portal-order?id=${encodeURIComponent(order.id)}">
           <div>
             <h2>${order.title}</h2>
             <p class="order-meta">
@@ -107,7 +107,7 @@ function showAuth() {
 
 navSignout?.addEventListener('click', async () => {
   await portalApi.signOut();
-  window.location.href = '/portal.html';
+  window.location.href = '/portal';
 });
 
 signinForm?.addEventListener('submit', async (e) => {

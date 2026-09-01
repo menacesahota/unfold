@@ -21,7 +21,7 @@ const ALL_STATUSES = [
 
 navSignout?.addEventListener('click', async () => {
   await portalApi.signOut();
-  window.location.href = '/portal.html';
+  window.location.href = '/portal';
 });
 
 function fillStatusSelects() {
@@ -156,12 +156,12 @@ async function boot() {
   try {
     const { profile } = await portalApi.getSession();
     if (!profile) {
-      window.location.href = '/portal.html';
+      window.location.href = '/portal';
       return;
     }
     if (profile.role !== 'admin') {
       gate.innerHTML =
-        '<p class="muted">Admin access only. <a href="/portal.html">Back to portal</a></p>';
+        '<p class="muted">Admin access only. <a href="/portal">Back to portal</a></p>';
       return;
     }
     gate.hidden = true;
