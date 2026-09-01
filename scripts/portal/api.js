@@ -43,7 +43,7 @@ const supabaseApi = {
       password,
       options: {
         data: { full_name, company_name },
-        emailRedirectTo: `${window.location.origin}/portal.html`,
+        emailRedirectTo: `${window.location.origin}/portal`,
       },
     });
     if (error) throw error;

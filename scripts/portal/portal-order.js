@@ -15,7 +15,7 @@ const navSignout = document.getElementById('nav-signout');
 
 navSignout?.addEventListener('click', async () => {
   await portalApi.signOut();
-  window.location.href = '/portal.html';
+  window.location.href = '/portal';
 });
 
 function paramsId() {
@@ -69,7 +69,7 @@ function render(detail, profile) {
   root.innerHTML = `
     <div class="panel-head">
       <div>
-        <p class="portal-kicker"><a href="/portal.html">Orders</a> / ${order.order_number}</p>
+        <p class="portal-kicker"><a href="/portal">Orders</a> / ${order.order_number}</p>
         <h1 class="portal-title">${order.title}</h1>
         <p class="portal-lead">
           ${meta.label}
@@ -203,20 +203,20 @@ function render(detail, profile) {
 async function boot() {
   const id = paramsId();
   if (!id) {
-    root.innerHTML = '<p class="muted">Missing order id. <a href="/portal.html">Back to orders</a></p>';
+    root.innerHTML = '<p class="muted">Missing order id. <a href="/portal">Back to orders</a></p>';
     return;
   }
 
   try {
     const { profile } = await portalApi.getSession();
     if (!profile) {
-      window.location.href = '/portal.html';
+      window.location.href = '/portal';
       return;
     }
     const detail = await portalApi.getOrder(id);
     render(detail, profile);
   } catch (err) {
-    root.innerHTML = `<p class="muted">${err.message || 'Could not load order.'} <a href="/portal.html">Back</a></p>`;
+    root.innerHTML = `<p class="muted">${err.message || 'Could not load order.'} <a href="/portal">Back</a></p>`;
   }
 }
 
