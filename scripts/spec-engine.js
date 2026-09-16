@@ -259,16 +259,21 @@ document.getElementById('download-spec')?.addEventListener('click', async () => 
   }
 });
 
-document.getElementById('manufacture-spec')?.addEventListener('click', () => {
+const quoteDialog = document.getElementById('quote-dialog');
+function openQuote(event) {
+  event?.preventDefault();
   if (!form.reportValidity()) return;
   const spec = refresh();
   track('spec_to_quote', { style: spec.style.code });
-  const params = new URLSearchParams({
-    product: 'boxes',
-    quote: 'spec',
-  });
-  sessionStorage.setItem('unfold-spec-brief', specMessage(spec));
-  window.location.href = `/?${params.toString()}#brief`;
-});
+  const quoteForm = document.getElementById('quote-form');
+  quoteForm.elements.box_brief.value = specMessage(spec);
+  quoteForm.elements.quantity.value = spec.quantity;
+  quoteForm.elements.product.value = 'boxes';
+  document.getElementById('form-status').textContent = '';
+  quoteDialog.showModal();
+}
+document.getElementById('manufacture-spec')?.addEventListener('click', openQuote);
+document.querySelectorAll('[data-open-quote]').forEach(link => link.addEventListener('click', openQuote));
+document.getElementById('close-quote')?.addEventListener('click', () => quoteDialog.close());
 
 refresh();

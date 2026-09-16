@@ -42,6 +42,16 @@
 .brief-builder .band-grid div { padding: .6rem .4rem; }
 .brief-builder .band-note { color: var(--ink-muted); }
 .brief-builder :focus-visible { outline: 3px solid #6c814f; outline-offset: 3px; }
+.brief-builder:has(dialog[open]) { overflow: hidden; }
+#quote-dialog { width: min(560px, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); margin: auto; padding: 1.5rem; border: 1px solid var(--line); border-radius: 16px; color: var(--ink); background: var(--paper); overscroll-behavior: contain; }
+#quote-dialog::backdrop { background: rgb(18 17 15 / 45%); }
+.dialog-heading { display: flex; justify-content: space-between; gap: 1rem; align-items: start; }
+.dialog-heading h2 { margin: 0; font-size: 1.5rem; letter-spacing: -.04em; }
+#close-quote { min-width: 44px; min-height: 44px; border: 1px solid var(--line); background: white; border-radius: 50%; font-size: 1.5rem; cursor: pointer; }
+#quote-dialog > p { font-size: .85rem; color: var(--ink-muted); }
+#quote-dialog .quote-form { padding: 0; border: 0; background: none; }
+#quote-dialog textarea { width: 100%; resize: vertical; }
+#quote-dialog [readonly] { font-size: .8rem; background: var(--paper-deep); }
 @media (max-width: 760px) {
   .brief-builder .tools-layout { grid-template-columns: 1fr; }
   .brief-builder .tools-hero { padding: 2rem 0 1.5rem; }

@@ -30,7 +30,7 @@
         <nav class="nav" id="site-nav" aria-label="Main">
           <a href="/spec.html">Box brief</a>
           <a href="/ppwr.html">PPWR pack</a>
-          <a href="/#brief">Free quote</a>
+          <a href="#quote-dialog" data-open-quote>Free quote</a>
           <a href="/portal.html">Portal</a>
         </nav>
       </div>
@@ -149,7 +149,7 @@
 
           <p class="measure-help">Not sure about materials or printing? Leave the starting options and ask us to help when you request a quote.</p>
           </section>
-          <p class="brief-help">Need a hand choosing? <a href="/?product=help#brief">Tell us about your product →</a></p>
+          <p class="brief-help">Need a hand choosing? <a href="#quote-dialog" data-open-quote>Tell us about your product →</a></p>
                 </form>
 
         <div class="tools-panel">
@@ -174,6 +174,21 @@
       </div>
     </main>
 
+    <dialog id="quote-dialog" aria-labelledby="quote-title">
+      <div class="dialog-heading"><div><p class="tools-kicker">THE NEXT STEP</p><h2 id="quote-title">Let’s review your box.</h2></div><button type="button" id="close-quote" aria-label="Close quote form">×</button></div>
+      <p>Your box details are included below. Add your contact details and we’ll get back to you.</p>
+      <form id="quote-form" class="quote-form" method="post" action="https://formsubmit.co/hello@unfold.supply">
+        <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
+        <input type="hidden" id="quote-product-select" name="product" value="boxes" />
+        <input type="hidden" name="quantity" />
+        <div class="field-row"><label class="field">Name<input name="name" required autocomplete="name" /></label><label class="field">Email<input name="email" type="email" required autocomplete="email" /></label></div>
+        <label class="field">Anything else we should know? <span class="field-optional">optional</span><textarea name="message" rows="3" placeholder="Your product, deadline or any questions"></textarea></label>
+        <details class="brief-disclosure"><summary>Your included box brief</summary><label class="field">Box details<textarea name="box_brief" rows="8" readonly></textarea></label></details>
+        <p class="review-note">We use your details to respond to this enquiry. FormSubmit delivers the request to Unfold.</p>
+        <button type="submit" class="btn">Send quote request</button>
+        <p id="form-status" class="form-note" role="status"></p>
+      </form>
+    </dialog>
     <footer class="site-footer">
       <div class="container footer-inner">
         <span class="footer-brand">unfold</span>
@@ -185,5 +200,6 @@
 
     <script type="module" src="/scripts/nav.js"></script>
     <script type="module" src="/scripts/spec-engine.js"></script>
+    <script type="module" src="/scripts/main.js"></script>
   </body>
 </html>

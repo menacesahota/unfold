@@ -211,7 +211,7 @@ form?.addEventListener('submit', async (e) => {
         delivery_postcode: String(form.elements.delivery_postcode?.value || ''),
         print: String(form.elements.print?.value || ''),
         needed_by: String(form.elements.needed_by?.value || ''),
-        message: String(messageField?.value || '—'),
+        message: [form.elements.box_brief?.value, messageField?.value].filter(Boolean).join('\n\n') || '—',
         _replyto: email,
         _subject: `Free packaging quote — ${product.label} — ${name}`,
         _template: 'table',
