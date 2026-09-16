@@ -286,3 +286,5 @@
     height: 280px;
   }
 }
+
+.style-shortcuts{display:flex;flex-wrap:wrap;gap:.5rem}.style-shortcuts button{padding:.7rem;border:1px solid var(--line);border-radius:5px;background:white;color:var(--ink);font:inherit;cursor:pointer}.style-shortcuts button[aria-pressed=true]{background:var(--ink);color:white}.band-card h2{margin-bottom:.5rem}.band-grid{margin-block:1rem}[hidden]{display:none!important}

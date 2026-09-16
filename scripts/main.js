@@ -1,8 +1,10 @@
+import { track } from './analytics.js';
 /**
  * unfold — free packaging quote flow (category → quote request → FormSubmit)
  */
 
 const PRODUCTS = [
+  { id: 'help', label: 'Help me choose', blurb: 'Tell us about your product. We will help with the packaging.', icon: 'other' },
   {
     id: 'boxes',
     label: 'Boxes',
@@ -66,6 +68,7 @@ function setProduct(id, { scroll = false } = {}) {
   const product = productById(id);
   selectedProduct = product ? product.id : '';
 
+  if (product && selectedProduct) track('product_select', { product: product.id });
   if (productSelect) productSelect.value = selectedProduct;
   if (productTypeHidden) productTypeHidden.value = product?.label || '';
 
@@ -129,7 +132,12 @@ function renderProducts() {
   }
 }
 
+let quoteStarted = false;
+form?.addEventListener('input', () => {
+  if (!quoteStarted) { quoteStarted = true; track('quote_start'); }
+});
 form?.addEventListener('submit', async (e) => {
+  if (form.elements._honey?.value) { e.preventDefault(); return; }
   const submitBtn = form.querySelector('button[type="submit"]');
   const fileInput = document.getElementById('quote-files');
   const files = fileInput?.files ? [...fileInput.files] : [];
@@ -170,7 +178,9 @@ form?.addEventListener('submit', async (e) => {
     return;
   }
 
+  track('quote_submit_attempt', { product: product.id });
   if (files.length) {
+    track('quote_attachment_handoff', { product: product.id });
     if (submitBtn) submitBtn.disabled = true;
     formStatus.textContent = 'Uploading attachment and sending…';
     return;
@@ -213,7 +223,7 @@ form?.addEventListener('submit', async (e) => {
     const resultMessage = String(result.message || '');
     const needsActivation = /activat/i.test(resultMessage);
     const failed =
-      (!res.ok || result.success === 'false' || result.success === false) &&
+      (!res.ok || !(result.success === 'true' || result.success === true)) &&
       !needsActivation;
 
     if (failed) {
@@ -223,6 +233,8 @@ form?.addEventListener('submit', async (e) => {
     if (needsActivation) {
       throw new Error('The enquiry service is not ready. Please email hello@unfold.supply; your details remain in this form.');
     }
+    track('quote_submit_success', { product: product.id });
+    quoteStarted = false;
     form.reset();
     setProduct('');
     const fileList = document.getElementById('quote-file-list');
@@ -231,14 +243,9 @@ form?.addEventListener('submit', async (e) => {
       fileList.textContent = '';
     }
 
-    if (needsActivation) {
-      formStatus.textContent =
-        'Almost there — check hello@unfold.supply for a FormSubmit activation email, click Activate once, then submit again.';
-    } else {
-      formStatus.textContent =
-        'Quote request sent. We’ll review your requirements and get back to you.';
-    }
+    formStatus.textContent = 'Quote request sent. We’ll review your requirements and get back to you.';
   } catch (err) {
+    track('quote_submit_error');
     const detail = err?.message ? ` ${err.message}` : '';
     formStatus.textContent = `Could not send automatically.${detail} Email hello@unfold.supply and we will help.`;
     console.error(err);
@@ -266,7 +273,7 @@ document.getElementById('quote-files')?.addEventListener('change', (e) => {
 if (new URLSearchParams(window.location.search).get('quote') === 'sent') {
   if (formStatus) {
     formStatus.textContent =
-      'Quote request sent. We’ll review your requirements and get back to you.';
+      'You have returned from the attachment service. Check its confirmation; if the upload did not complete, email hello@unfold.supply.';
   }
   const url = new URL(window.location.href);
   url.searchParams.delete('quote');
@@ -289,4 +296,9 @@ if (storedBrief) {
   }
   sessionStorage.removeItem('unfold-spec-brief');
   if (!hashProduct) setProduct('boxes');
+}
+
+if (params.get('sample') === 'yes') {
+  const details = document.getElementById('quote-details');
+  if (details && !details.value) details.value = 'I would like to discuss a physical sample, including availability and cost.';
 }

@@ -41,6 +41,6 @@ export function fefcoPreviewAlt(code, label = '') {
 
 export function fefcoPreviewNote(code) {
   const file = fefcoPreviewFile(code);
-  if (file === code) return '';
-  return `Photo is the ${file} family — same erected look.`;
+  if (file === code) return 'Illustrative image, not a verified production specification.';
+  return `Related ${file} family illustration; closure and construction may differ. Confirm with the supplier.`;
 }

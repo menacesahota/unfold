@@ -8,6 +8,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
+        mailers: resolve(__dirname, 'mailer-boxes.html'),
+        shipping: resolve(__dirname, 'shipping-boxes.html'),
+        retail: resolve(__dirname, 'retail-boxes.html'),
         pricing: resolve(__dirname, 'pricing.html'),
         portal: resolve(__dirname, 'portal.html'),
         portalOrder: resolve(__dirname, 'portal-order.html'),

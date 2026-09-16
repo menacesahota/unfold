@@ -1,3 +1,4 @@
+import { track } from './analytics.js';
 /**
  * Box Spec Engine — style photo, price band, PDF.
  */
@@ -13,6 +14,7 @@ import {
   INKS,
   REGIONS,
   WALLS,
+  STYLES,
   fillStyleSelect,
   formatGbp,
   formatUsd,
@@ -102,7 +104,7 @@ function showPreview(spec) {
     const note = fefcoPreviewNote(code);
     previewCap.textContent = note
       ? `FEFCO ${code} · ${spec.style.title}. ${note}`
-      : `FEFCO ${code} · ${spec.style.title}`;
+      : `FEFCO ${code} · ${spec.style.title}. Illustrative image; structure and fit require supplier review.`;
   }
 }
 
@@ -121,13 +123,17 @@ function renderStyleMeta(spec) {
     ];
     meta.innerHTML = bits.map((b) => `<span>${b}</span>`).join('');
   }
-  if (overlapField) overlapField.hidden = !spec.style.needsOverlap;
+  if (overlapField) {
+    overlapField.hidden = !spec.style.needsOverlap;
+    overlapField.querySelector("input").disabled = !spec.style.needsOverlap;
+  }
 }
 
 function renderBand(spec) {
   if (!bandEl) return;
   const { low, mid, high, belowMoq } = spec.band;
   bandEl.innerHTML = `
+    <h2>Illustrative base-box estimate</h2><p class="band-note">GBP per box, with run totals below. This formula is not a supplier quote.</p>
     <div class="band-grid">
       <div>
         <span class="band-label">Low</span>
@@ -146,8 +152,9 @@ function renderBand(spec) {
       </div>
     </div>
     <p class="band-note">
-      ${belowMoq ? `Below usual MOQ of ${spec.moq}. ` : ''}
-      Ex VAT, ballpark only. USD is indicative. Manufacture through unfold to lock a price.
+      Size, quantity, style, board colour and wall type affect this model. Supplier minimums must be confirmed for your order.
+    </p><p class="band-note"><strong>Not included:</strong> print, coatings, tooling, setup, freight, duties or VAT. Print, coating and delivery selections are saved in your brief but do not change this estimate.
+    </p><p class="band-note">The low/high figures are model margins (−15% / +25%), not supplier bids. USD uses a fixed 1.27 USD per GBP illustration, not a live exchange rate.
     </p>
     ${
       spec.style.needsOverlap
@@ -169,6 +176,7 @@ function renderChecklist() {
 
 function refresh() {
   const spec = readSpec();
+  document.querySelectorAll('[data-style]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.style === spec.style.code)));
   showPreview(spec);
   renderBand(spec);
   renderStyleMeta(spec);
@@ -181,33 +189,40 @@ function specMessage(spec) {
       ? `${spec.length} × ${spec.width} × ${spec.height}/${spec.overlap} mm (L × W × H / o)`
       : `${spec.length} × ${spec.width} × ${spec.height} mm`;
   return [
-    `Box spec request`,
+    `Box brief for supplier review`,
     `Style: FEFCO ${spec.style.code} ${spec.style.title} (${spec.style.erection}, ${spec.style.pieces}-piece)`,
     `Size: ${size}`,
     `Qty: ${spec.quantity}`,
     `Board: ${spec.board.label} / ${spec.wall.label}`,
     `Print: ${spec.ink.label} / ${spec.coating.label}`,
-    `Ship-from: ${spec.region.label}`,
+    `Delivery region: ${spec.region.label}`,
     spec.brandName ? `Brand: ${spec.brandName}` : '',
-    `Mid band: ${formatGbp(spec.band.mid.unit)} / box (${formatGbp(spec.band.mid.total)} total)`,
+    `Illustrative base-box estimate: ${formatGbp(spec.band.mid.unit)} / box (${formatGbp(spec.band.mid.total)} total). Excludes print, coating, tooling, setup, freight, duties and VAT. Not a quote.`,
     `Source: ${FEFCO_SOURCE}`,
   ]
     .filter(Boolean)
     .join('\n');
 }
 
-fillStyleSelect(styleSelect, undefined, '0201');
+const requestedStyle = new URLSearchParams(location.search).get('style');
+fillStyleSelect(styleSelect, undefined, STYLES.some(s => s.code === requestedStyle) ? requestedStyle : '0201');
+document.querySelectorAll('[data-style]').forEach(button => {
+  button.addEventListener('click', () => { styleSelect.value = button.dataset.style; refresh(); });
+});
+form?.addEventListener('submit', e => e.preventDefault());
 
 renderChecklist();
 form?.addEventListener('input', refresh);
 form?.addEventListener('change', refresh);
 
 document.getElementById('download-spec')?.addEventListener('click', async () => {
+  if (!form.reportValidity()) return;
   const spec = refresh();
   if (statusEl) statusEl.textContent = 'Building PDF…';
   try {
     await generateSpecPdf(spec);
-    if (statusEl) statusEl.textContent = 'Saved. Send it to a converter, or ask unfold to make it.';
+    track('spec_download', { style: spec.style.code });
+    if (statusEl) statusEl.textContent = 'Saved. Ask Unfold to review the brief and confirm a quote.';
   } catch (err) {
     console.error(err);
     if (statusEl) statusEl.textContent = 'Could not build the PDF. Try again.';
@@ -215,7 +230,9 @@ document.getElementById('download-spec')?.addEventListener('click', async () => 
 });
 
 document.getElementById('manufacture-spec')?.addEventListener('click', () => {
+  if (!form.reportValidity()) return;
   const spec = refresh();
+  track('spec_to_quote', { style: spec.style.code });
   const params = new URLSearchParams({
     product: 'boxes',
     quote: 'spec',

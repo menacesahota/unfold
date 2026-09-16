@@ -385,9 +385,9 @@ export const ARTWORK_CHECKLIST = [
   'Artwork on a separate layer from cut, crease and glue.',
   'Bleed at least 3 mm beyond the cut. No critical type in the glue tab.',
   'Barcodes and QR codes placed by you, not generated as decoration.',
-  'Keep type as live outlines or 300 ppi minimum at print size.',
+  'Supply fonts as outlines or embed them; check image resolution with the printer.',
   'Supply CMYK or the agreed spot. Do not assume RGB will print true.',
-  'Die is not production-ready until the plant confirms flute, caliper and joint.',
+  'Use the supplier-approved artwork template before preparing final print files.',
 ];
 
 export const EPR_MARKETS = [
