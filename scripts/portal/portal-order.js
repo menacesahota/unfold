@@ -1,4 +1,6 @@
 import { portalApi } from './api.js';
+import { escapeHtml } from '../buyer-catalog.js';
+import { installRepeatTools } from './repeat-tools.js';
 import {
   JOURNEY_STEPS,
   STATUS_META,
@@ -214,9 +216,11 @@ async function boot() {
       return;
     }
     const detail = await portalApi.getOrder(id);
-    render(detail, profile);
+    const safe = JSON.parse(JSON.stringify(detail), (key, value) => typeof value === 'string' ? escapeHtml(value) : value);
+    render(safe, profile);
+    installRepeatTools(root, detail);
   } catch (err) {
-    root.innerHTML = `<p class="muted">${err.message || 'Could not load order.'} <a href="/portal.html">Back</a></p>`;
+    root.innerHTML = `<p class="muted">${escapeHtml(err.message || 'Could not load order.')} <a href="/portal.html">Back</a></p>`;
   }
 }
 

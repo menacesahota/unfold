@@ -5,7 +5,7 @@ const source = fs.readFileSync('scripts/main.js', 'utf8').replace(/^import[^\n]*
 async function scenario(response, {attachment=false, ok=true, brief=false}={}) {
   const handlers={}, events=[];
   const fields=Object.fromEntries(Object.entries({name:'Test',email:'test@example.invalid',message:'Test brief',quantity:'500',_honey:''}).map(([k,value])=>[k,{value}]));
-  if (brief) fields.box_brief={value:'Box: 410 × 220 × 150 mm'};
+  if (brief) fields.box_brief={value:'Box: 410 x 220 x 150 mm'};
   let payload;
   const button={disabled:false};
   let reset=false, calls=0, prevented=false;
@@ -27,6 +27,10 @@ const attachment=await scenario({}, {attachment:true});assert.equal(attachment.c
 console.log('Passed: quote start deduplication, confirmed success, failed/unknown/activation responses preserve form, attachment handoff distinct from success. No network requests sent.');
 
 const inline=await scenario({success:true},{brief:true});
-assert.equal(inline.payload.message,'Box: 410 × 220 × 150 mm\n\nTest brief');
+assert.equal(inline.payload.message,'Box: 410 x 220 x 150 mm\n\nTest brief');
 assert.equal(success.payload.message,'Test brief');
 console.log('Passed: inline quote includes both box specification and customer notes.');
+
+assert.match(success.payload.request_reference, /^UF-/);
+assert(success.payload._subject.includes(success.payload.request_reference));
+assert(success.status.includes(success.payload.request_reference));

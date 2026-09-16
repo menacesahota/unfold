@@ -41,11 +41,9 @@ export async function generateSpecPdf(spec, { download = true, imageData } = {})
     `Delivery region: ${spec.region.label}`,
     ...(spec.style.needsOverlap?[`Overlap requested: ${spec.overlap} mm`]:[])
   ].forEach(text=>paragraph(text));
-  heading('Illustrative base-box estimate (GBP)');
-  paragraph(`Low: ${formatGbp(spec.band.low.unit)} / box | Mid: ${formatGbp(spec.band.mid.unit)} / box | High: ${formatGbp(spec.band.high.unit)} / box`,{bold:true});
-  paragraph(`Run totals: ${formatGbp(spec.band.low.total)} to ${formatGbp(spec.band.high.total)} for ${spec.quantity} boxes.`);
-  paragraph('Model inputs: dimensions, quantity, style, board colour and wall type. The range is -15% / +25% around a formula, not supplier bids or a confirmed quote.');
-  paragraph('Excluded: print, coatings, tooling, setup, freight, duties and VAT. Print, coating and delivery choices do not change this estimate. Supplier minimum quantities and timing require confirmation.');
+  heading('Pricing & next steps');
+  paragraph('Request a reviewed quote for this specification and quantity. Confirm goods, print, tooling, setup, delivery and VAT before ordering.');
+  paragraph('Minimum quantities, sample availability and production timing are confirmed by the supplier. This brief is not a priced offer or artwork approval.');
   pdf.addPage(); header('ILLUSTRATIVE STYLE & ARTWORK PREPARATION');
   paragraph(`FEFCO ${spec.style.code} - ${spec.style.title}`,{bold:true,size:14});
   try {

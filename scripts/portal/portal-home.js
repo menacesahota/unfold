@@ -1,4 +1,5 @@
 import { portalApi, portalMode } from './api.js';
+import { escapeHtml } from '../buyer-catalog.js';
 import { STATUS_META, formatMoney, formatDate } from './journey.js';
 
 const authView = document.getElementById('auth-view');
@@ -70,9 +71,9 @@ function renderOrders(orders, profile) {
       return `
         <a class="order-card" href="/portal-order.html?id=${encodeURIComponent(order.id)}">
           <div>
-            <h2>${order.title}</h2>
+            <h2>${escapeHtml(order.title)}</h2>
             <p class="order-meta">
-              ${order.order_number}
+              ${escapeHtml(order.order_number)}
               · Updated ${formatDate(order.updated_at)}
               ${order.lead_time_days != null ? `· Lead time ${order.lead_time_days} days` : ''}
             </p>

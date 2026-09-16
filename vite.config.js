@@ -8,6 +8,13 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
+        packaging: resolve(__dirname, 'packaging.html'),
+        product: resolve(__dirname, 'product.html'),
+        samples: resolve(__dirname, 'samples.html'),
+        artwork: resolve(__dirname, 'artwork.html'),
+        approach: resolve(__dirname, 'approach.html'),
+        start: resolve(__dirname, 'start.html'),
+        quotes: resolve(__dirname, 'quotes.html'),
         mailers: resolve(__dirname, 'mailer-boxes.html'),
         shipping: resolve(__dirname, 'shipping-boxes.html'),
         retail: resolve(__dirname, 'retail-boxes.html'),

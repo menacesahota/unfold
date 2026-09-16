@@ -133,12 +133,17 @@ function renderProducts() {
 }
 
 let quoteStarted = false;
+let requestReference = '';
 form?.addEventListener('input', () => {
   if (!quoteStarted) { quoteStarted = true; track('quote_start'); }
 });
 form?.addEventListener('submit', async (e) => {
   if (form.elements._honey?.value) { e.preventDefault(); return; }
   const submitBtn = form.querySelector('button[type="submit"]');
+  if (submitBtn?.disabled) { e.preventDefault(); return; }
+  if (!requestReference) requestReference = `UF-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).slice(2,8).toUpperCase()}`;
+  const referenceField = form.elements.request_reference;
+  if (referenceField) referenceField.value = requestReference;
   const fileInput = document.getElementById('quote-files');
   const files = fileInput?.files ? [...fileInput.files] : [];
   const totalBytes = files.reduce((sum, file) => sum + file.size, 0);
@@ -166,7 +171,7 @@ form?.addEventListener('submit', async (e) => {
   const subjectField = document.getElementById('quote-subject');
   const replytoField = document.getElementById('quote-replyto');
   if (subjectField) {
-    subjectField.value = `Free packaging quote — ${product.label} — ${name}`;
+    subjectField.value = `Packaging request ${requestReference} — ${product.label} — ${name}`;
   }
   if (replytoField) replytoField.value = email;
   if (productSelect) productSelect.value = product.id;
@@ -200,6 +205,7 @@ form?.addEventListener('submit', async (e) => {
         Accept: 'application/json',
       },
       body: JSON.stringify({
+        request_reference: requestReference,
         name,
         email,
         company,
@@ -213,7 +219,7 @@ form?.addEventListener('submit', async (e) => {
         needed_by: String(form.elements.needed_by?.value || ''),
         message: [form.elements.box_brief?.value, messageField?.value].filter(Boolean).join('\n\n') || '—',
         _replyto: email,
-        _subject: `Free packaging quote — ${product.label} — ${name}`,
+        _subject: `Packaging request ${requestReference} — ${product.label} — ${name}`,
         _template: 'table',
         _captcha: 'false',
       }),
@@ -243,7 +249,8 @@ form?.addEventListener('submit', async (e) => {
       fileList.textContent = '';
     }
 
-    formStatus.textContent = 'Quote request sent. We’ll review your requirements and get back to you.';
+    formStatus.textContent = `Request ${requestReference} sent. Keep this reference. We’ll review your brief, check supplier options and contact you with next steps. Nothing has been ordered or charged. For an urgent deadline, email hello@unfold.supply with this reference.`;
+    requestReference = '';
   } catch (err) {
     track('quote_submit_error');
     const detail = err?.message ? ` ${err.message}` : '';

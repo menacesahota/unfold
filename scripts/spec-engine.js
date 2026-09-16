@@ -130,43 +130,7 @@ function renderStyleMeta(spec) {
 }
 
 function renderBand(spec) {
-  if (!bandEl) return;
-  const { low, mid, high, belowMoq } = spec.band;
-  bandEl.innerHTML = `
-    <h2>Illustrative base-box estimate</h2><p class="band-note">GBP per box, with run totals below. This formula is not a supplier quote.</p>
-    <div class="band-grid">
-      <div>
-        <span class="band-label">Low</span>
-        <strong>${formatGbp(low.unit)}</strong>
-        <span>${formatGbp(low.total)} · ${formatUsd(toUsd(low.total))}</span>
-      </div>
-      <div class="is-mid">
-        <span class="band-label">Mid</span>
-        <strong>${formatGbp(mid.unit)}</strong>
-        <span>${formatGbp(mid.total)} · ${formatUsd(toUsd(mid.total))}</span>
-      </div>
-      <div>
-        <span class="band-label">High</span>
-        <strong>${formatGbp(high.unit)}</strong>
-        <span>${formatGbp(high.total)} · ${formatUsd(toUsd(high.total))}</span>
-      </div>
-    </div>
-    <p class="band-note">
-      Size, quantity, style, board colour and wall type affect this model. Supplier minimums must be confirmed for your order.
-    </p><p class="band-note"><strong>Not included:</strong> print, coatings, tooling, setup, freight, duties or VAT. Print, coating and delivery selections are saved in your brief but do not change this estimate.
-    </p><p class="band-note">The low/high figures are model margins (−15% / +25%), not supplier bids. USD uses a fixed 1.27 USD per GBP illustration, not a live exchange rate.
-    </p>
-    ${
-      spec.style.needsOverlap
-        ? `<p class="band-note">Overlap o = ${spec.overlap} mm. FEFCO writes this as L × W × H / o.</p>`
-        : ''
-    }
-    ${
-      spec.style.pieces > 1
-        ? '<p class="band-note">Two-piece style — body and lid are separate. Lid is sized L+ × W+ to clear board caliper.</p>'
-        : ''
-    }
-  `;
+  if (bandEl) bandEl.innerHTML = '<h2>A reviewed price for your box</h2><p class="band-note">Request a quote for your quantity. We’ll confirm the specification, print, setup, delivery and VAT before you commit.</p>';
 }
 
 function renderChecklist() {
@@ -227,7 +191,6 @@ function specMessage(spec) {
     `Print: ${spec.ink.label} / ${spec.coating.label}`,
     `Delivery region: ${spec.region.label}`,
     spec.brandName ? `Brand: ${spec.brandName}` : '',
-    `Illustrative base-box estimate: ${formatGbp(spec.band.mid.unit)} / box (${formatGbp(spec.band.mid.total)} total). Excludes print, coating, tooling, setup, freight, duties and VAT. Not a quote.`,
     `Source: ${FEFCO_SOURCE}`,
   ]
     .filter(Boolean)
