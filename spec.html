@@ -18,8 +18,9 @@
     />
     <link rel="stylesheet" href="/styles/main.css" />
     <link rel="stylesheet" href="/styles/tools.css" />
+    <link rel="stylesheet" href="/styles/brief.css" />
   </head>
-  <body>
+  <body class="brief-builder">
     <header class="site-header">
       <div class="container header-inner">
         <a href="/" class="logo">unfold</a>
@@ -39,28 +40,34 @@
       <section class="tools-hero">
         <div class="container">
           <p class="tools-kicker">PLAN YOUR PACKAGING</p>
-          <h1>Box brief builder</h1>
+          <h1>A better box starts<br />with a clear brief.</h1>
           <p class="lead">
-            Explore a style, add your internal dimensions and prepare a brief for supplier review. This is a starting point, not a production specification or a confirmed quote.
+            Choose your box, tell us what you need, and take the next step with a brief you can share. No account needed.
           </p>
         </div>
       </section>
 
       <div class="container tools-layout">
         <form class="tools-form" id="spec-form">
-          <div>
-            <h2>Pack</h2>
-            <p class="style-hint" id="style-hint"></p>
-            <p class="style-meta" id="style-meta"></p>
-          </div>
+          <section class="brief-section">
+          <div class="section-heading"><span>01</span><div><h2>Choose your box</h2><p>Start with the shape that suits your product.</p></div></div>
 
-          <div class="style-shortcuts" role="group" aria-label="Common box styles"><button type="button" data-style="0201">Shipping carton</button><button type="button" data-style="0427">Mailer</button><button type="button" data-style="0300">Separate lid</button></div>
-          <p class="tools-source">Unsure? <a href="/?product=help#brief">Ask us to choose with you</a>. Enter internal dimensions in mm: length × width × height.</p>
+          <div class="box-choices" role="group" aria-label="Common box styles">
+            <button type="button" data-style="0201"><img src="/fefco/0201.png" alt="" /><strong>Shipping carton</strong><span>Everyday dispatch</span></button>
+            <button type="button" data-style="0427"><img src="/fefco/0427.png" alt="" /><strong>Mailer</strong><span>A considered unboxing</span></button>
+            <button type="button" data-style="0300"><img src="/fefco/0300.png" alt="" /><strong>Separate lid</strong><span>Two-piece presentation</span></button>
+          </div>
           <label class="field">
-            All styles
+            Or choose a FEFCO style
             <select name="style" id="spec-style"></select>
           </label>
 
+          <p class="style-hint" id="style-hint"></p>
+          <details class="brief-disclosure"><summary>Style details</summary><p class="style-meta" id="style-meta"></p></details>
+          </section>
+          <section class="brief-section">
+          <div class="section-heading"><span>02</span><div><h2>Size &amp; quantity</h2><p>Measure the space you need inside the box.</p></div></div>
+          <p class="measure-help">All sizes are in millimetres. Length is the longer opening edge, width is the shorter edge, and height runs from base to top. Allow space for your product and protective packing.</p>
           <div class="field-row">
             <label class="field">
               Length (mm)
@@ -86,16 +93,19 @@
             <input type="number" required name="overlap" min="5" max="250" step="1" value="40" />
           </label>
 
+          </section>
+          <section class="brief-section">
+          <div class="section-heading"><span>03</span><div><h2>Make it yours</h2><p>Set your preferences. We’ll confirm what works.</p></div></div>
           <div class="field-row">
             <label class="field">
-              Board
+              Board colour
               <select name="board">
                 <option value="kraft">Kraft</option>
                 <option value="white">White</option>
               </select>
             </label>
             <label class="field">
-              Wall
+              Board strength
               <select name="wall">
                 <option value="single">Single wall</option>
                 <option value="double">Double wall</option>
@@ -105,7 +115,7 @@
 
           <div class="field-row">
             <label class="field">
-              Print
+              Print method
               <select name="ink">
                 <option value="none" selected>Unprinted</option>
                 <option value="water-flexo">Water-based flexo</option>
@@ -134,31 +144,32 @@
 
           <label class="field">
             Brand on the pack <span class="field-optional">optional</span>
-            <input type="text" maxlength="120" name="brand" placeholder="Shown on the spec PDF" autocomplete="organization" />
+            <input type="text" maxlength="120" name="brand" placeholder="Your brand name" autocomplete="organization" />
           </label>
 
-          <div class="tools-actions">
-            <button type="button" class="btn" id="download-spec">Download brief PDF</button>
-            <button type="button" class="btn btn-ghost" id="manufacture-spec">Request a reviewed quote</button>
-          </div>
-          <p class="form-note" id="spec-status" role="status"></p>
-          <p class="tools-source">
-            Style numbers follow the
-            <a href="https://www.fefco.org/sites/default/files/files/FEFCO%20Code_WEB%287%29.pdf" rel="noopener" target="_blank">FEFCO Code, 12th edition (2022)</a>.
-            Images are illustrative, may show a related box family and do not change with your measurements. The supplier must confirm the structure, fit, material and artwork template.
-          </p>
-        </form>
+          <p class="measure-help">Not sure about materials or printing? Leave the starting options and ask us to help when you request a quote.</p>
+          </section>
+          <p class="brief-help">Need a hand choosing? <a href="/?product=help#brief">Tell us about your product →</a></p>
+                </form>
 
         <div class="tools-panel">
+          <div class="brief-review">
+          <div class="review-heading"><span class="tools-kicker">YOUR BOX BRIEF</span><span class="draft-badge">Draft for review</span></div>
           <div class="style-stage">
             <img id="style-preview" alt="Erected box style" />
             <p class="style-stage-cap" id="style-preview-cap"></p>
           </div>
-          <div class="band-card" id="price-band"></div>
-          <div class="checklist-card">
-            <h2>Artwork checklist</h2>
-            <ol id="artwork-checklist"></ol>
+          <div id="brief-summary" class="brief-summary" aria-live="polite"></div>
+          <div class="tools-actions">
+            <button type="button" class="btn" id="manufacture-spec">Get a reviewed quote <span aria-hidden="true">→</span></button>
+            <button type="button" class="btn btn-ghost" id="download-spec">Download brief PDF</button>
           </div>
+          <p class="form-note" id="spec-status" role="status"></p>
+          <p class="review-note">We’ll confirm the structure, material, fit and price before production. This brief is a starting point.</p>
+          </div>
+          <details class="brief-disclosure support-card"><summary>Explore an indicative budget</summary><div class="band-card" id="price-band"></div></details>
+          <details class="brief-disclosure support-card"><summary>Preparing artwork?</summary><div class="checklist-card"><ol id="artwork-checklist"></ol></div></details>
+          <p class="tools-source">Style references follow the <a href="https://www.fefco.org/sites/default/files/files/FEFCO%20Code_WEB%287%29.pdf" target="_blank" rel="noopener">FEFCO Code</a>. Photos illustrate a box family; they are not a scale preview and do not reflect your selected colours or print.</p>
         </div>
       </div>
     </main>

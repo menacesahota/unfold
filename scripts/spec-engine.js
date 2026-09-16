@@ -32,7 +32,7 @@ const checklistEl = document.getElementById('artwork-checklist');
 const styleSelect = document.getElementById('spec-style');
 
 function num(name, fallback) {
-  const n = Number(form.elements[name]?.value);
+  const n = Number(form.elements.namedItem(name)?.value);
   return Number.isFinite(n) && n > 0 ? n : fallback;
 }
 
@@ -180,6 +180,36 @@ function refresh() {
   showPreview(spec);
   renderBand(spec);
   renderStyleMeta(spec);
+  const summary = document.getElementById('brief-summary');
+  const valid = [...form.querySelectorAll('input[type="number"]')].every(input => input.disabled || input.validity.valid);
+  if (summary) {
+    summary.replaceChildren();
+    const title = document.createElement('h2');
+    title.textContent = `FEFCO ${spec.style.code} · ${spec.style.title}`;
+    summary.append(title);
+    const list = document.createElement('dl');
+    const rows = [
+      ['Internal size', valid ? `${spec.length} × ${spec.width} × ${spec.height} mm` : 'Check size and quantity'],
+      ['Quantity', valid ? `${spec.quantity.toLocaleString()} boxes` : 'Check measurements above'],
+      ['Material', `${spec.board.label} · ${spec.wall.label}`],
+      ['Print', spec.ink.label],
+      ['Coating', spec.coating.label],
+      ['Delivery', spec.region.label],
+    ];
+    if (spec.style.needsOverlap) rows.push(['Overlap', valid ? `${spec.overlap} mm` : 'Check overlap']);
+    if (spec.brandName) rows.push(['Brand', spec.brandName]);
+    rows.forEach(([label, value]) => {
+      const row = document.createElement('div');
+      const term = document.createElement('dt');
+      const detail = document.createElement('dd');
+      term.textContent = label;
+      detail.textContent = value;
+      row.append(term, detail);
+      list.append(row);
+    });
+    summary.append(list);
+  }
+  if (!valid && bandEl) bandEl.textContent = 'Enter valid dimensions and quantity to see an indicative budget.';
   return spec;
 }
 

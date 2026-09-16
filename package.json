@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "outreach:daily": "node outreach/send-daily.mjs",
     "outreach:dry": "node outreach/send-daily.mjs --dry-run",
-    "test": "node tests/quote-flow.mjs && node tests/analytics.mjs"
+    "test": "node tests/quote-flow.mjs && node tests/analytics.mjs && node tests/spec-inputs.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.110.9",

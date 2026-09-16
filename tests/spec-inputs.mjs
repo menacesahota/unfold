@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import vm from 'node:vm';
+const source = readFileSync('scripts/spec-engine.js', 'utf8');
+const numericReader = source.slice(source.indexOf('function num('), source.indexOf('function readSpec('));
+const fields = { length: { value: '410' }, width: { value: '220' } };
+const context = vm.createContext({ form: { elements: { length: 16, namedItem: name => fields[name] } } });
+vm.runInContext(numericReader, context);
+assert.equal(vm.runInContext("num('length', 300)", context), 410, 'Length must read the named input, not the collection length');
+assert.equal(vm.runInContext("num('width', 300)", context), 220);
+console.log('Passed: custom box length is read correctly despite form collection name collision.');
