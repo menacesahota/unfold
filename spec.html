@@ -23,7 +23,10 @@
     <header class="site-header">
       <div class="container header-inner">
         <a href="/" class="logo">unfold</a>
-        <nav class="nav" aria-label="Main">
+        <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
+          <span></span><span></span><span></span>
+        </button>
+        <nav class="nav" id="site-nav" aria-label="Main">
           <a href="/spec.html">Box spec</a>
           <a href="/ppwr.html">PPWR pack</a>
           <a href="/#brief">Free quote</a>
@@ -169,6 +172,7 @@
       </div>
     </footer>
 
+    <script type="module" src="/scripts/nav.js"></script>
     <script type="module" src="/scripts/spec-engine.js"></script>
   </body>
 </html>

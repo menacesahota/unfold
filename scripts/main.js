@@ -72,7 +72,7 @@ function setProduct(id, { scroll = false } = {}) {
   productGrid?.querySelectorAll('.product-card').forEach((card) => {
     const active = card.dataset.product === selectedProduct;
     card.classList.toggle('active', active);
-    card.setAttribute('aria-selected', String(active));
+    card.setAttribute('aria-pressed', String(active));
   });
 
   if (selectedLabel) {
@@ -98,8 +98,8 @@ function renderProducts() {
     <button
       type="button"
       class="product-card"
-      role="option"
-      aria-selected="false"
+
+      aria-pressed="false"
       data-product="${product.id}"
     >
       <span class="product-card-head">
@@ -197,6 +197,10 @@ form?.addEventListener('submit', async (e) => {
         product_type: product.label,
         quantity: String(quantityField?.value || '—'),
         current_price: String(form.elements.current_price?.value || '—'),
+        dimensions: String(form.elements.dimensions?.value || ''),
+        delivery_postcode: String(form.elements.delivery_postcode?.value || ''),
+        print: String(form.elements.print?.value || ''),
+        needed_by: String(form.elements.needed_by?.value || ''),
         message: String(messageField?.value || '—'),
         _replyto: email,
         _subject: `Free packaging quote — ${product.label} — ${name}`,
@@ -216,6 +220,9 @@ form?.addEventListener('submit', async (e) => {
       throw new Error(resultMessage || 'Could not send quote request.');
     }
 
+    if (needsActivation) {
+      throw new Error('The enquiry service is not ready. Please email hello@unfold.supply; your details remain in this form.');
+    }
     form.reset();
     setProduct('');
     const fileList = document.getElementById('quote-file-list');
@@ -229,7 +236,7 @@ form?.addEventListener('submit', async (e) => {
         'Almost there — check hello@unfold.supply for a FormSubmit activation email, click Activate once, then submit again.';
     } else {
       formStatus.textContent =
-        'Quote request sent — we’ll reply within one working day.';
+        'Quote request sent. We’ll review your requirements and get back to you.';
     }
   } catch (err) {
     const detail = err?.message ? ` ${err.message}` : '';
@@ -259,7 +266,7 @@ document.getElementById('quote-files')?.addEventListener('change', (e) => {
 if (new URLSearchParams(window.location.search).get('quote') === 'sent') {
   if (formStatus) {
     formStatus.textContent =
-      'Quote request sent — we’ll reply within one working day.';
+      'Quote request sent. We’ll review your requirements and get back to you.';
   }
   const url = new URL(window.location.href);
   url.searchParams.delete('quote');

@@ -96,6 +96,7 @@ p {
   align-items: center;
   justify-content: space-between;
   height: var(--header-h);
+  gap: 1rem;
 }
 
 .logo {
@@ -103,10 +104,12 @@ p {
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.04em;
+  flex-shrink: 0;
 }
 
 .nav {
   display: flex;
+  align-items: center;
   gap: 1.75rem;
 }
 
@@ -114,11 +117,47 @@ p {
   font-size: 0.875rem;
   font-weight: 500;
   color: var(--ink-muted);
+  white-space: nowrap;
   transition: color 0.2s;
 }
 
 .nav a:hover {
   color: var(--ink);
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  margin-right: -10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  background: var(--ink);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.site-header.is-nav-open .nav-toggle span:nth-child(1) {
+  transform: translateY(6.5px) rotate(45deg);
+}
+
+.site-header.is-nav-open .nav-toggle span:nth-child(2) {
+  opacity: 0;
+}
+
+.site-header.is-nav-open .nav-toggle span:nth-child(3) {
+  transform: translateY(-6.5px) rotate(-45deg);
 }
 
 /* Buttons */
@@ -1564,6 +1603,54 @@ input[type="file"] {
 
 /* Mobile */
 @media (max-width: 900px) {
+  .nav-toggle {
+    display: flex;
+    margin-left: auto;
+    height: var(--header-h);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    min-height: var(--header-h);
+  }
+
+  .header-inner {
+    flex-wrap: wrap;
+  }
+
+  .site-header.is-nav-open .header-inner {
+    height: auto;
+  }
+
+  .nav {
+    display: none;
+    flex: 1 0 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0.15rem 0 0.85rem;
+    border-top: 1px solid var(--line);
+    margin-top: 0;
+  }
+
+  .site-header.is-nav-open .nav {
+    display: flex;
+  }
+
+  .nav a {
+    display: block;
+    padding: 0.85rem 0;
+    font-size: 1rem;
+    color: var(--ink);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav a:last-child {
+    border-bottom: 0;
+    padding-bottom: 0.2rem;
+  }
+
   .hero {
     grid-template-columns: 1fr;
     min-height: auto;
@@ -1713,7 +1800,4 @@ input[type="file"] {
     grid-template-columns: 1fr;
   }
 
-  .nav {
-    gap: 1.25rem;
-  }
 }
