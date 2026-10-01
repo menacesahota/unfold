@@ -17,7 +17,7 @@ function renderQuote(q){
 }
 async function load(){
  quotes=await result(supabase.from('packaging_quotes').select('*').order('created_at',{ascending:false}));
- document.getElementById('quote-list').innerHTML=quotes.map(renderQuote).join('')||'<p class="buyer-callout">No published quotes yet. <a href="/start.html">Start a packaging request</a>.</p>';
+ document.getElementById('quote-list').innerHTML=quotes.map(renderQuote).join('')||'<p class="buyer-callout">No published quotes yet. <a href="/start">Start a packaging request</a>.</p>';
  if(quotes.length){
   const events=await result(supabase.from('packaging_quote_events').select('*').in('quote_id',quotes.map(q=>q.id)).order('created_at',{ascending:false}));
   for(const q of quotes){const node=document.querySelector(`[data-id="${q.id}"] [data-events]`);node.textContent=events.filter(e=>e.quote_id===q.id).map(e=>`${new Date(e.created_at).toLocaleString('en-GB')} · ${e.action}${e.detail?' · '+e.detail:''}`).join('\n')||'No activity yet.';node.style.whiteSpace='pre-wrap';}
@@ -51,7 +51,7 @@ async function adminSetup(){
  await refreshQueue();
 }
 async function boot(){
- if(!enabled){root.innerHTML='<div class="buyer-callout"><h2>Quote review by email</h2><p>Online quote approval is not available yet. Your Unfold contact will send your reviewed quote and confirm payment arrangements directly.</p><div class="actions"><a class="btn" href="/start.html">Start a request</a><a class="text-link" href="/portal.html">Track existing orders</a></div></div>';return;}
+ if(!enabled){root.innerHTML='<div class="buyer-callout"><h2>Quote review by email</h2><p>Online quote approval is not available yet. Your Unfold contact will send your reviewed quote and confirm payment arrangements directly.</p><div class="actions"><a class="btn" href="/start">Start a request</a><a class="text-link" href="/portal.html">Track existing orders</a></div></div>';return;}
  const {data:{user},error}=await supabase.auth.getUser();
  if(error||!user){root.innerHTML='<p class="buyer-callout">Sign in to your customer account to view your private quotes. <a href="/portal.html">Sign in →</a></p>';return;}
  profile=await result(supabase.from('profiles').select('*').eq('id',user.id).single());
@@ -68,7 +68,7 @@ async function boot(){
     const link=document.createElement('a');link.href=data.signedUrl;link.target='_blank';link.rel='noopener';link.textContent=`Open proof ${q.proof_version} (link expires in 2 minutes)`;button.after(link);return;
    }
    if(action==='reorder'){
-    sessionStorage.setItem('unfold-reorder',`Previous quote ${q.reference}, version ${q.version}\n${q.specification}\nArtwork version: ${q.proof_version||'None'}\nConfirm reuse of this artwork and current pricing before ordering.`);location.href='/start.html?request=reorder';return;
+    sessionStorage.setItem('unfold-reorder',`Previous quote ${q.reference}, version ${q.version}\n${q.specification}\nArtwork version: ${q.proof_version||'None'}\nConfirm reuse of this artwork and current pricing before ordering.`);location.href='/start?request=reorder';return;
    }
    if(action==='accept'&&!item.querySelector('[data-agree]').checked)throw Error('Read the specification, total, timing, terms and any attached proof, then tick the approval box.');
    const detail=action==='changes'?item.querySelector('[data-changes]').value:action==='accept'?`Customer approved quote v${q.version}${q.proof_version?` and proof ${q.proof_version}`:''}`:'';

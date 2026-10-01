@@ -1,8 +1,52 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 
+// Clean paths Render already serves for these HTML documents.
+// Includes portal/ppwr/spec/pricing so local dev and preview match
+// those routes and do not shadow them.
+const htmlPages = new Set([
+  '/packaging',
+  '/start',
+  '/product',
+  '/samples',
+  '/artwork',
+  '/approach',
+  '/quotes',
+  '/portal',
+  '/ppwr',
+  '/spec',
+  '/pricing',
+  '/portal-order',
+  '/portal-admin',
+])
+
+function rewriteCleanHtmlUrl(req, _res, next) {
+  const raw = req.url ?? ''
+  const queryAt = raw.indexOf('?')
+  const path = queryAt === -1 ? raw : raw.slice(0, queryAt)
+  const normalized = path.length > 1 && path.endsWith('/') ? path.slice(0, -1) : path
+  if (htmlPages.has(normalized)) {
+    const query = queryAt === -1 ? '' : raw.slice(queryAt)
+    req.url = `${normalized}.html${query}`
+  }
+  next()
+}
+
+function cleanHtmlUrls() {
+  return {
+    name: 'clean-html-urls',
+    configureServer(server) {
+      server.middlewares.use(rewriteCleanHtmlUrl)
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(rewriteCleanHtmlUrl)
+    },
+  }
+}
+
 export default defineConfig({
   root: '.',
+  plugins: [cleanHtmlUrls()],
   build: {
     outDir: 'dist',
     rollupOptions: {
